@@ -41,7 +41,7 @@ class Puzzle_slider(object):
 		return None
 
 	# Retorna a posição onde está o ZERO
-	def return_position_free(self):
+	def position_free(self):
 		for i in range(self.size):
 			for j in range(self.size):
 				if self.matrix[i][j] == 0:
@@ -50,7 +50,7 @@ class Puzzle_slider(object):
 		return None
 
 	#	1 = up_down; 	2 = down_up;	3 = left_right;		4 = right_left
-	def move(self, i,j):
+	def move_free(self, i,j):
 		#i,j = self.return_position_free()
 
 		positions = []
@@ -145,26 +145,25 @@ class Puzzle_slider(object):
 
 		#return self.matrix
 
+	def matrix_reorder_all(self, amount):
 
-juca = Puzzle_slider(4)
+		for iterations in range(amount):
+			print("======Rodada {} ======".format(iterations))
+			i,j = self.position_free()
+			list_moviment_free = self.move_free(i,j)
+
+			moviment = random.choice(list_moviment_free)
+			print("Movimento", moviment)
+			self.matrix_reorder(moviment, i,j)
+
+		return self.matrix
+
+
+Puzzle = Puzzle_slider(4)
 
 print()
-juca.print()
+Puzzle.print()
 
-for i in range(0,100):
-	print("======Rodada {} ======".format(i))
-
-	i,j = juca.return_position_free()
-	list_j = juca.move(i,j)
-
-	num = random.choice(list_j)
-	print("Movimento", num)
-	juca.matrix_reorder(num, i,j)
-	juca.print()
-
-
-
-
-
-
-
+matrix_end = Puzzle.matrix_reorder_all(100)
+print(matrix_end)
+Puzzle.print()
