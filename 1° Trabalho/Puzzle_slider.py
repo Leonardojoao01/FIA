@@ -31,11 +31,11 @@ class Puzzle_slider(object):
 		for i in range(size):
 			for j in range(size):
 				self.matrix[i][j] = aux+j
-			aux = aux + 4
+			aux = aux + size
 
 		self.matrix[size-1][size-1]=0
 
-		print(self.matrix)
+		#print(self.matrix)
 
 	def create_matrix_with_date(self, size, date):
 		return None
@@ -148,22 +148,58 @@ class Puzzle_slider(object):
 	def matrix_reorder_all(self, amount):
 
 		for iterations in range(amount):
-			print("======Rodada {} ======".format(iterations))
+			#print("======Rodada {} ======".format(iterations))
 			i,j = self.position_free()
 			list_moviment_free = self.move_free(i,j)
 
 			moviment = random.choice(list_moviment_free)
-			print("Movimento", moviment)
+			#print("Movimento", moviment)
 			self.matrix_reorder(moviment, i,j)
 
 		return self.matrix
 
+	# Criar a matriz generica p/ comparar
+	def compare_matrix(self, matrix_1):
+		matrix = [[1,2,3,],[4,5,6,],[7,8,0]]
 
-Puzzle = Puzzle_slider(4)
+		return matrix == matrix_1
 
-print()
-Puzzle.print()
+	# Criar status matriz reordenada
+	# Busca em profundidade
+	# Adicionar uma fila
+	def process_status_final(self):
+		status_compare = self.compare_matrix(self.matrix)
+		aux = 0
+		print(status_compare)
+		while not status_compare:
+			i,j = self.position_free()
+			list_moviment_free = self.move_free(i,j)
+
+			moviment = random.choice(list_moviment_free)
+			#print("Movimento", moviment)
+			self.matrix_reorder(moviment, i,j)
+
+			status_compare = self.compare_matrix(self.matrix)
+			aux = aux +1
+		print(aux)
+
+Puzzle = Puzzle_slider(3)
+
+#status_compare = Puzzle.compare_matrix(matrix)
+#print(status_compare)
+
+#print()
+#Puzzle.print()
 
 matrix_end = Puzzle.matrix_reorder_all(100)
-print(matrix_end)
+#print(matrix_end)
 Puzzle.print()
+
+Puzzle.process_status_final()
+
+print("Reordenada")
+Puzzle.print()
+
+
+
+	
