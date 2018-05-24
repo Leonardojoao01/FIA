@@ -1,11 +1,14 @@
+# -*- encoding:utf-8 -*-
 #!/usr/bin/python
 
-# -*- encoding:utf-8 -*-
+
 import random
 
 class Puzzle_slider(object):
 
-	matrix = None
+	matrix_origin = None
+	matrix_compare = None
+
 	size = None
 
 	# Verificar se os dados passados são válidos(size. date)
@@ -16,12 +19,20 @@ class Puzzle_slider(object):
 		else:
 			self.create_matrix_without_date(size)
 
+	def get_matrix_origin(self):
+		return self.matrix_origin
+
+	def get_matrix_compare(self):
+		return self.matrix_compare
+
 
 	def create_matrix(self, size):
-		self.matrix = [0]*size
+		self.matrix_origin = [0]*size
+		self.matrix_compare = [0] * size
 
 		for i in range(size):
-			self.matrix[i] = [0] * size
+			self.matrix_origin[i] = [0] * size
+			self.matrix_compare[i] = [0] * size
 		
 
 	def create_matrix_without_date(self, size):
@@ -30,10 +41,17 @@ class Puzzle_slider(object):
 
 		for i in range(size):
 			for j in range(size):
-				self.matrix[i][j] = aux+j
+				self.matrix_origin[i][j] = aux+j
+				self.matrix_compare[i][j] = aux+j
 			aux = aux + size
 
-		self.matrix[size-1][size-1]=0
+		#juca = self.matrix_origin
+
+		self.matrix_origin[size-1][size-1]=0
+		self.matrix_compare[size-1][size-1]=0
+		#self.matrix_compare = self.ma
+
+		return self.matrix_origin
 
 		#print(self.matrix)
 
@@ -41,10 +59,10 @@ class Puzzle_slider(object):
 		return None
 
 	# Retorna a posição onde está o ZERO
-	def position_free(self):
+	def position_free(self, matrix):
 		for i in range(self.size):
 			for j in range(self.size):
-				if self.matrix[i][j] == 0:
+				if matrix[i][j] == 0:
 					return i,j
 			
 		return None
@@ -117,89 +135,164 @@ class Puzzle_slider(object):
 			print("CASO DESCONHECIDO")
 
 
-	def matrix_reorder(self, amount, p_free_i, p_free_j):
+	def matrix_reorder(self, amount, matrix, p_free_i, p_free_j):
 
 		if amount == 1:
-			self.matrix[p_free_i][p_free_j] = self.matrix[p_free_i+1][p_free_j]
-			self.matrix[p_free_i+1][p_free_j] = 0
+			matrix[p_free_i][p_free_j] = matrix[p_free_i+1][p_free_j]
+			matrix[p_free_i+1][p_free_j] = 0
 
 		elif amount == 2:
-			self.matrix[p_free_i][p_free_j] = self.matrix[p_free_i-1][p_free_j]
-			self.matrix[p_free_i-1][p_free_j] = 0
+			matrix[p_free_i][p_free_j] = matrix[p_free_i-1][p_free_j]
+			matrix[p_free_i-1][p_free_j] = 0
 
 		elif amount == 3:
-			self.matrix[p_free_i][p_free_j] = self.matrix[p_free_i][p_free_j+1]
-			self.matrix[p_free_i][p_free_j+1] = 0
+			matrix[p_free_i][p_free_j] = matrix[p_free_i][p_free_j+1]
+			matrix[p_free_i][p_free_j+1] = 0
 
 		elif amount == 4:
-			self.matrix[p_free_i][p_free_j] = self.matrix[p_free_i][p_free_j-1]
-			self.matrix[p_free_i][p_free_j-1] = 0
+			matrix[p_free_i][p_free_j] = matrix[p_free_i][p_free_j-1]
+			matrix[p_free_i][p_free_j-1] = 0
 
 		else:
 			print("Movimento ilegal")
 
+		return matrix
 
-	def print(self):
+	def print_t(self, matrix):
 		for i in range(self.size):
-				print(self.matrix[i])
+			print(matrix[i])
 
 		#return self.matrix
 
-	def matrix_reorder_all(self, amount):
+	def matrix_reorder_all(self, amount, matrix):
 
 		for iterations in range(amount):
 			#print("======Rodada {} ======".format(iterations))
-			i,j = self.position_free()
+			i,j = self.position_free(matrix)
 			list_moviment_free = self.move_free(i,j)
 
 			moviment = random.choice(list_moviment_free)
 			#print("Movimento", moviment)
-			self.matrix_reorder(moviment, i,j)
+			self.matrix_reorder(moviment, matrix, i,j)
 
-		return self.matrix
+		return matrix
 
 	# Criar a matriz generica p/ comparar
-	def compare_matrix(self, matrix_1):
-		matrix = [[1,2,3,],[4,5,6,],[7,8,0]]
 
-		return matrix == matrix_1
+	def compare_matrix(self, matrix_process):
+		#matrix_compare = [[1,2,3,4,],[5,6,7,8,],[9,10,11,0,]]
+		status = False
+		if self.matrix_compare == matrix_process:
+			status = True
+
+		return status
 
 	# Criar status matriz reordenada
 	# Busca em profundidade
-	# Adicionar uma fila
-	def process_status_final(self):
-		status_compare = self.compare_matrix(self.matrix)
+	# Adicionar uma fila de processos
+	# Adicionar uma lista de nodos processados
+	"""def Depth_First_Search(self, matrix):
+		status_compare = self.compare_matrix(matrix)
 		aux = 0
 		print(status_compare)
+
 		while not status_compare:
-			i,j = self.position_free()
+			i,j = self.position_free(matrix)
 			list_moviment_free = self.move_free(i,j)
 
 			moviment = random.choice(list_moviment_free)
 			#print("Movimento", moviment)
-			self.matrix_reorder(moviment, i,j)
+			matrix = self.matrix_reorder(moviment, matrix, i,j)
 
-			status_compare = self.compare_matrix(self.matrix)
+			status_compare = self.compare_matrix(matrix)
 			aux = aux +1
 		print(aux)
 
+		return matrix"""
+
+	def Depth_First_Search(self, matrix):
+		list_procs = []
+		list_DFS = []
+		depth = 0
+
+		list_procs.append(matrix)
+		matrix = list_procs.pop()
+
+		status_compare = self.compare_matrix(matrix)
+
+		while not status_compare:
+			list_DFS.append(matrix)
+
+			i,j = self.position_free(matrix)
+			list_moviment_free = self.move_free(i,j)
+
+			moviment = random.choice(list_moviment_free)
+			matrix = self.matrix_reorder(moviment, matrix, i,j)
+
+			list_procs.append(matrix)
+			matrix = list_procs.pop()
+
+			status_compare = self.compare_matrix(matrix)
+			depth = depth +1
+			#list_procs.append(matrix)
+		#print(depth)
+
+		return matrix
+
+	def Breadth_First_Search(self, matrix):
+		list_procs = []
+		list_BFS = []
+		depth = 0
+
+		list_procs.append(matrix)
+		matrix = list_procs.pop()
+
+		status_compare = self.compare_matrix(matrix)
+
+		print(matrix)
+		print("")
+		#while not status_compare:
+		print("=====LOOP+++++")
+		while depth != 2:
+
+			list_BFS.append(matrix)
+#----------------------------------------------------
+			i,j = self.position_free(matrix)
+			list_moviment_free = self.move_free(i,j)
+
+			print("Movimentos: ",list_moviment_free)
+			self.print_t(matrix)
+
+			print("====================")
+			for moviment in list_moviment_free:
+				matrix_aux = self.matrix_reorder(moviment, matrix, i,j)
+				list_procs.append(matrix_aux)
+				print("")
+				self.print_t(matrix_aux)
+			print("====================")
+			matrix = list_procs.pop(0)
+			status_compare = self.compare_matrix(matrix)
+			depth = depth +1
+			#list_procs.append(matrix)
+
+#----------------------------------------------------
+		return matrix
+
 Puzzle = Puzzle_slider(3)
 
-#status_compare = Puzzle.compare_matrix(matrix)
-#print(status_compare)
+matrix_reordered = Puzzle.matrix_reorder_all(100, Puzzle.get_matrix_origin())
+#Puzzle.print_t(matrix_reordered)
+print(matrix_reordered)
+#juca = matrix_reordered
 
-#print()
-#Puzzle.print()
+#matrix_DFS = Puzzle.Depth_First_Search(matrix_reordered)
+#print("DFS:")
+#Puzzle.print_t(matrix_DFS)
 
-matrix_end = Puzzle.matrix_reorder_all(100)
-#print(matrix_end)
-Puzzle.print()
+#print(juca)
 
-Puzzle.process_status_final()
-
-print("Reordenada")
-Puzzle.print()
-
-
+matrix_BFS = Puzzle.Breadth_First_Search(matrix_reordered)
+print("BSF:")
+Puzzle.print_t(matrix_BFS)
 
 	
