@@ -1,6 +1,34 @@
 # -*- encoding:utf-8 -*-
 
+class No:
+	def __init__(self, data, level):
+		self.father		= None
+		self.data       = data
+		self.leaf_one   = None
+		self.leaf_two   = None
+		self.leaf_three = None
+		self.leaf_four  = None
+		self.level		= level
 
+	def get_data(self):
+		return self.data
+
+	def set_father(self, data):
+		self.father = data
+
+	def get_father(self):
+		return self.father
+
+	def get_level(self):
+		return self.level
+
+	def set_leaf_one(self, leaf):
+		self.leaf_one = leaf
+
+	def get_leaf_one(self):
+		return self.leaf_one
+
+"""
 class No:
 	def __init__(self, data):
 		self.data       = data;
@@ -8,7 +36,7 @@ class No:
 		self.down_up    = None;
 		self.left_right = None;
 		self.right_left = None;
-
+"""
 class Arvore(object):
 
 	#def __init__(self, data):

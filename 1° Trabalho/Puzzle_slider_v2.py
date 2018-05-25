@@ -1,6 +1,7 @@
 # -*- encoding:utf-8 -*-
 #!/usr/bin/python
 
+from Tree import No
 import copy
 import random
 
@@ -8,64 +9,67 @@ class Puzzle_slider(object):
 
 	matrix_origin = None
 	matrix_compare = None
-
 	size = None
+
+	father_of_all = None		# Serve para algo
+
+	list_DFS = []
+	list_BFS = []
+
 
 	# Verificar se os dados passados são válidos(size. date)
 	def __init__(self, size, date=None):
 		self.size = size
 		if date is not None:
-			self.create_matrix_with_date(size, date)
+			self.create_matrix_with_date(date)
 		else:
-			self.create_matrix_without_date(size)
+			self.create_matrix_without_date()
 
-	def get_matrix_origin(self):
-		return self.matrix_origin
+	#def get_matrix_origin(self):
+	#	return self.matrix_origin
 
-	def get_matrix_compare(self):
-		return self.matrix_compare
+	#def get_matrix_compare(self):
+	#	return self.matrix_compare
+
+	def get_father_of_all(self):
+		return self.father_of_all
 
 
-	def create_matrix(self, size):
-		self.matrix_origin = [0]*size
-		self.matrix_compare = [0] * size
+	def create_matrix(self):
+		self.matrix_origin = [0]*self.size
 
-		for i in range(size):
-			self.matrix_origin[i] = [0] * size
-			self.matrix_compare[i] = [0] * size
+		for i in range(self.size):
+			self.matrix_origin[i] = [0] * self.size
 		
 
-	def create_matrix_without_date(self, size):
+	def create_matrix_without_date(self):
 		aux = 1
-		self.create_matrix(size)
+		self.create_matrix()
 
-		for i in range(size):
-			for j in range(size):
+		for i in range(self.size):
+			for j in range(self.size):
 				self.matrix_origin[i][j] = aux+j
-				self.matrix_compare[i][j] = aux+j
-			aux = aux + size
+			aux = aux + self.size
 
-		#juca = self.matrix_origin
+		self.matrix_origin[self.size-1][self.size-1]=0
+		self.matrix_compare = copy.deepcopy(self.matrix_origin)
 
-		self.matrix_origin[size-1][size-1]=0
-		self.matrix_compare[size-1][size-1]=0
-		#self.matrix_compare = self.ma
+		self.father_of_all = copy.deepcopy(No(self.matrix_compare, level=0)) # Verificar a utilização do DEEP
 
-		return self.matrix_origin
 
-		#print(self.matrix)
 
-	def create_matrix_with_date(self, size, date):
+	def create_matrix_with_date(self, date):
 		return None
 
 	# Retorna a posição onde está o ZERO
 	def position_free(self, matrix):
+		#print("=======", matrix)
 		for i in range(self.size):
 			for j in range(self.size):
 				if matrix[i][j] == 0:
 					return i,j
 			
-		return None
+		#return None
 
 	#	1 = up_down; 	2 = down_up;	3 = left_right;		4 = right_left
 	def move_free(self, i,j):
@@ -104,8 +108,8 @@ class Puzzle_slider(object):
 
 		elif i!=self.size-1 and j!=self.size-1:
 			positions.append(1)
-			positions.append(3)
 			positions.append(2)
+			positions.append(3)
 			positions.append(4)
 			return positions
 			#return 1,2,None,4
@@ -123,7 +127,6 @@ class Puzzle_slider(object):
 			return positions
 
 
-
 		elif i!=self.size-1 and j==self.size-1:
 			positions.append(1)
 			positions.append(2)
@@ -135,28 +138,30 @@ class Puzzle_slider(object):
 			print("CASO DESCONHECIDO")
 
 
+	# Arrumar
 	def matrix_reorder(self, amount, matrix, p_free_i, p_free_j):
-		matrix_aux = copy.copy(matrix)
+
 		if amount == 1:
-			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i+1][p_free_j]
-			matrix_aux[p_free_i+1][p_free_j] = 0
+			matrix[p_free_i][p_free_j] = matrix[p_free_i+1][p_free_j]
+			matrix[p_free_i+1][p_free_j] = 0
 
 		elif amount == 2:
-			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i-1][p_free_j]
-			matrix_aux[p_free_i-1][p_free_j] = 0
+			matrix[p_free_i][p_free_j] = matrix[p_free_i-1][p_free_j]
+			matrix[p_free_i-1][p_free_j] = 0
 
 		elif amount == 3:
-			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i][p_free_j+1]
-			matrix_aux[p_free_i][p_free_j+1] = 0
+			matrix[p_free_i][p_free_j] = matrix[p_free_i][p_free_j+1]
+			matrix[p_free_i][p_free_j+1] = 0
 
 		elif amount == 4:
-			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i][p_free_j-1]
-			matrix_aux[p_free_i][p_free_j-1] = 0
+			matrix[p_free_i][p_free_j] = matrix[p_free_i][p_free_j-1]
+			matrix[p_free_i][p_free_j-1] = 0
 
 		else:
 			print("Movimento ilegal")
 
-		return matrix_aux
+		return matrix
+
 
 	def print_t(self, matrix):
 		for i in range(self.size):
@@ -188,18 +193,20 @@ class Puzzle_slider(object):
 		return status
 		
 
-	def Depth_First_Search(self, matrix):
+	# Recebe o objeto NO
+	def Depth_First_Search(self, no):
 		list_procs = []
-		list_DFS = []
-		depth = 0
+		depth = 0	# Verificar
 
-		list_procs.append(matrix)
+		list_procs.append(no.get_data())
 		matrix = list_procs.pop()
+
+		#print(matrix)
 
 		status_compare = self.compare_matrix(matrix)
 
 		while not status_compare:
-			list_DFS.append(matrix)
+			self.list_DFS.append(matrix)
 
 			i,j = self.position_free(matrix)
 			list_moviment_free = self.move_free(i,j)
@@ -207,16 +214,24 @@ class Puzzle_slider(object):
 			moviment = random.choice(list_moviment_free)
 			matrix = self.matrix_reorder(moviment, matrix, i,j)
 
+			# Criar o novo nó e atribuir a um filho
+
+			depth = depth+1
+
+			son = No(matrix, level=depth)
+			no.set_leaf_one(son)
+
+			son.set_father(no)
+
+			#depth = depth+1
 			list_procs.append(matrix)
 			matrix = list_procs.pop()
-
 			status_compare = self.compare_matrix(matrix)
-			depth = depth +1
-			#list_procs.append(matrix)
-		#print(depth)
 
-		print(depth)
-		return matrix
+		#print(depth)
+		return son
+
+
 
 	def Breadth_First_Search(self, matrix):
 		list_procs = []
@@ -256,14 +271,24 @@ class Puzzle_slider(object):
 
 Puzzle = Puzzle_slider(3)
 
-matrix_reordered = Puzzle.matrix_reorder_all(100, Puzzle.get_matrix_origin())
+Puzzle_2 = copy.deepcopy(Puzzle)
+
+matrix_reordered = Puzzle.matrix_reorder_all(100, Puzzle.get_father_of_all().get_data())
 print(matrix_reordered)
 
 print("DFS:")
-matrix_DFS = Puzzle.Depth_First_Search(copy.deepcopy(matrix_reordered))
-Puzzle.print_t(matrix_DFS)
+# Envia o objeto pai da árvore, p os filhos acessarem
+matrix_DFS = Puzzle.Depth_First_Search(Puzzle.get_father_of_all())#copy.deepcopy(matrix_reordered))
+print(matrix_DFS.get_data())
+print(matrix_DFS.get_level())
 
-print("BSF:")
-matrix_BFS = Puzzle.Breadth_First_Search(copy.deepcopy(matrix_reordered))
-Puzzle.print_t(matrix_BFS)
+
+#Resolver esse problema
+print(Puzzle_2.get_father_of_all().get_data())
+
+#Puzzle.print_t(matrix_DFS)
+
+#print("BSF:")
+#matrix_BFS = Puzzle.Breadth_First_Search(copy.deepcopy(matrix_reordered))
+#Puzzle.print_t(matrix_BFS)
 
