@@ -256,7 +256,7 @@ class Puzzle_slider(object):
 
 Puzzle = Puzzle_slider(3)
 
-matrix_reordered = Puzzle.matrix_reorder_all(100, Puzzle.get_matrix_origin())
+matrix_reordered = Puzzle.matrix_reorder_all(10, Puzzle.get_matrix_origin())
 print(matrix_reordered)
 
 print("DFS:")

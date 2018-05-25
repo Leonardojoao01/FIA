@@ -180,7 +180,7 @@ class Puzzle_slider(object):
 			#print("Movimento", moviment)
 			self.matrix_reorder(moviment, matrix, i,j)
 
-		return matrix
+		return copy.deepcopy(matrix)
 
 	# Criar a matriz generica p/ comparar
 
@@ -202,6 +202,7 @@ class Puzzle_slider(object):
 		matrix = list_procs.pop()
 
 		#print(matrix)
+		print(no.get_data())
 
 		status_compare = self.compare_matrix(matrix)
 
@@ -263,30 +264,32 @@ class Puzzle_slider(object):
 
 			depth = depth +1
 
-		for ju in list_BFS:
-			print(ju)
+		#for ju in list_BFS:
+		#	print(ju)
 		#print(list_BFS)
 
 		return matrix
+
+
 
 Puzzle = Puzzle_slider(3)
 
 Puzzle_2 = copy.deepcopy(Puzzle)
 
-matrix_reordered = Puzzle.matrix_reorder_all(100, Puzzle.get_father_of_all().get_data())
+
+matrix_reordered = Puzzle.matrix_reorder_all(20, Puzzle.get_father_of_all().get_data())
 print(matrix_reordered)
 
 print("DFS:")
 # Envia o objeto pai da árvore, p os filhos acessarem
 matrix_DFS = Puzzle.Depth_First_Search(Puzzle.get_father_of_all())#copy.deepcopy(matrix_reordered))
-print(matrix_DFS.get_data())
-print(matrix_DFS.get_level())
-
 
 #Resolver esse problema
-print(Puzzle_2.get_father_of_all().get_data())
+print(matrix_DFS.get_level())
+print(matrix_DFS.get_data())
 
-#Puzzle.print_t(matrix_DFS)
+print(matrix_reordered)
+
 
 #print("BSF:")
 #matrix_BFS = Puzzle.Breadth_First_Search(copy.deepcopy(matrix_reordered))

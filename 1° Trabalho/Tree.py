@@ -22,11 +22,27 @@ class No:
 	def get_level(self):
 		return self.level
 
-	def set_leaf_one(self, leaf):
-		self.leaf_one = leaf
+	def set_leaf(self, leaf):
+		#self.leaf_one = leaf
+		leaf_aux = self.verify_son_free()
+		leaf_aux = leaf
+
 
 	def get_leaf_one(self):
 		return self.leaf_one
+
+	def verify_son_free(self):
+		leaf_aux = None
+		if self.leaf_one == None:
+			leaf_aux = self.leaf_one
+		elif self.leaf_two == None:
+			leaf_aux = self.leaf_two
+		elif self.leaf_three == None:
+			leaf_aux = self.leaf_three
+		elif self.leaf_four == None:
+			leaf_aux = self.leaf_four
+
+		return leaf_aux
 
 """
 class No:
