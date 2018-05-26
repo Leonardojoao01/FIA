@@ -3,8 +3,18 @@
 
 from Tree import No
 
-tree_1 = No(10)
-tree_2 = No(20)
+
+# def __init__(self, data, level):
+#     	self.father		= None
+# 		self.data       = data
+# 		self.leaf_one   = None
+# 		self.leaf_two   = None
+# 		self.leaf_three = None
+# 		self.leaf_four  = None
+# 		self.level		= level
+
+tree_1 = No(10)     # Pai
+tree_2 = No(20)     # Filho
 
 tree_2.set_father(tree_1)
 

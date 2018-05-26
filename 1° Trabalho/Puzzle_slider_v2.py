@@ -4,6 +4,7 @@
 from Tree import No
 import copy
 import random
+import time
 
 class Puzzle_slider(object):
 
@@ -220,7 +221,7 @@ class Puzzle_slider(object):
 			depth = depth+1
 
 			son = No(matrix, level=depth)
-			no.set_leaf_one(son)
+			no.set_leaf(son)
 
 			son.set_father(no)
 
@@ -274,7 +275,7 @@ class Puzzle_slider(object):
 
 Puzzle = Puzzle_slider(3)
 
-Puzzle_2 = copy.deepcopy(Puzzle)
+#Puzzle_2 = copy.deepcopy(Puzzle)
 
 
 matrix_reordered = Puzzle.matrix_reorder_all(20, Puzzle.get_father_of_all().get_data())
@@ -282,7 +283,10 @@ print(matrix_reordered)
 
 print("DFS:")
 # Envia o objeto pai da árvore, p os filhos acessarem
+t0 = time.time()
 matrix_DFS = Puzzle.Depth_First_Search(Puzzle.get_father_of_all())#copy.deepcopy(matrix_reordered))
+t1 = time.time()
+print ("Total time running: %s seconds" %(str(t1-t0)))
 
 #Resolver esse problema
 print(matrix_DFS.get_level())
@@ -291,7 +295,10 @@ print(matrix_DFS.get_data())
 print(matrix_reordered)
 
 
-#print("BSF:")
-#matrix_BFS = Puzzle.Breadth_First_Search(copy.deepcopy(matrix_reordered))
-#Puzzle.print_t(matrix_BFS)
+print("BSF:")
 
+t0 = time.time()
+matrix_BFS = Puzzle.Breadth_First_Search(copy.deepcopy(matrix_reordered))
+print(matrix_BFS)
+t1 = time.time()
+print("Total time running: %s seconds" %(str(t1-t0)))
