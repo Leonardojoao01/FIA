@@ -3,6 +3,7 @@
 
 import copy
 import random
+import time
 
 class Puzzle_slider(object):
 
@@ -245,6 +246,7 @@ class Puzzle_slider(object):
 	def Iterative_Depth_Search(self, matrix, level):
 		list_procs = []
 		list_IDS = []
+		list_IDS_aux = []
 		depth = 0
 
 		list_procs.append(matrix)
@@ -266,7 +268,7 @@ class Puzzle_slider(object):
 					list_procs.append(matrix_aux)
 					#print("Entrou")
 				else:
-    					matrix = matrix_aux
+					matrix = matrix_aux
 				aux = aux+1
 
 			if depth == level:
@@ -285,14 +287,23 @@ matrix_reordered = Puzzle.matrix_reorder_all(10, Puzzle.get_matrix_origin())
 print(matrix_reordered)
 
 print("DFS:")
+t0 = time.time()
 matrix_DFS = Puzzle.Depth_First_Search(copy.deepcopy(matrix_reordered))
+t1 = time.time()
+print ("Total time running: %s seconds" %(str(t1-t0)))
 Puzzle.print_t(matrix_DFS)
 
 print("BSF:")
+t0 = time.time()
 matrix_BFS = Puzzle.Breadth_First_Search(copy.deepcopy(matrix_reordered))
+t1 = time.time()
+print ("Total time running: %s seconds" %(str(t1-t0)))
 Puzzle.print_t(matrix_BFS)
 
 print("IDS:")
+t0 = time.time()
 matrix_IDS = Puzzle.Iterative_Depth_Search(copy.deepcopy(matrix_reordered), 300)
+t1 = time.time()
+print ("Total time running: %s seconds" %(str(t1-t0)))
 Puzzle.print_t(matrix_IDS)
 

@@ -216,14 +216,14 @@ class Puzzle_slider(object):
 			moviment = random.choice(list_moviment_free)
 			matrix = self.matrix_reorder(moviment, matrix, i,j)
 
-			# Criar o novo nó e atribuir a um filho
-
-			depth = depth+1
-
+			
+			depth = depth+1		# Utilizado p/ salvar a profundidade do nó
+			# Cria o novo nó e atribui pai a um filho
 			son = No(matrix, level=depth)
 			no.set_leaf(son)
 
 			son.set_father(no)
+			#-----------------------------------------
 
 			#depth = depth+1
 			list_procs.append(matrix)
@@ -235,29 +235,34 @@ class Puzzle_slider(object):
 
 
 
-	def Breadth_First_Search(self, matrix):
-		list_procs = []
-		list_BFS = []
-		depth = 0
+	def Breadth_First_Search(self, no):
+		list_procs = []		# Lista dos nós a serem processados
+		list_BFS = []		# Lista dos nós visitados
+		depth = 0			# Utiliza
 
-		list_procs.append(matrix)
+
+		list_procs.append(no.get_data())	# Adiciona na lista o nó a ser processado
 		matrix = list_procs.pop()
 
 		status_compare = self.compare_matrix(matrix)
 
-		list_BFS.append(matrix)
+		list_BFS.append(matrix)		# Adiciona na lista o matrix processada
 
 		while not status_compare:
-		#while depth != 3:
-
-			#list_BFS.append(matrix)
 
 			i,j = self.position_free(matrix)
 			list_moviment_free = self.move_free(i,j)
 
-			for moviment in list_moviment_free:
+			for moviment in list_moviment_free:		# Realiza tds os movimentos possíveis
 				matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
+				
+				son = No(copy.deepcopy(matrix_aux), level=depth)
+				no.set_leaf(son)
+				son.set_father(no)
+
 				list_procs.append(matrix_aux)
+
+			son.set_father(no)
 
 			matrix = list_procs.pop(0)
 			status_compare = self.compare_matrix(matrix)
@@ -269,7 +274,7 @@ class Puzzle_slider(object):
 		#	print(ju)
 		#print(list_BFS)
 
-		return matrix
+		return son
 
 
 
@@ -284,7 +289,7 @@ print(matrix_reordered)
 print("DFS:")
 # Envia o objeto pai da árvore, p os filhos acessarem
 t0 = time.time()
-matrix_DFS = Puzzle.Depth_First_Search(Puzzle.get_father_of_all())#copy.deepcopy(matrix_reordered))
+matrix_DFS = Puzzle.Depth_First_Search(copy.deepcopy(Puzzle.get_father_of_all()))#copy.deepcopy(matrix_reordered))
 t1 = time.time()
 print ("Total time running: %s seconds" %(str(t1-t0)))
 
@@ -292,13 +297,15 @@ print ("Total time running: %s seconds" %(str(t1-t0)))
 print(matrix_DFS.get_level())
 print(matrix_DFS.get_data())
 
-print(matrix_reordered)
+#print(matrix_reordered)
 
-
+print(Puzzle.get_father_of_all().get_data())
 print("BSF:")
-
 t0 = time.time()
-matrix_BFS = Puzzle.Breadth_First_Search(copy.deepcopy(matrix_reordered))
-print(matrix_BFS)
+matrix_BFS = Puzzle.Breadth_First_Search(copy.deepcopy(Puzzle.get_father_of_all()))
 t1 = time.time()
+
+print(matrix_BFS.get_data())
+print(matrix_BFS.get_level())
+
 print("Total time running: %s seconds" %(str(t1-t0)))
