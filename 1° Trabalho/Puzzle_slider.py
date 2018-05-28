@@ -214,12 +214,15 @@ class Puzzle_slider(object):
 			status_compare = self.compare_matrix(matrix)
 			depth = depth +1
 
-		#print(depth)
+		print(depth)
 		return matrix
 
 	def Breadth_First_Search(self, matrix):
 		list_procs = []
 		list_BFS = []
+		list_BFS_level = []
+		depth = 0
+		depth_final = 0
 
 		list_procs.append(matrix)
 		matrix = list_procs.pop()
@@ -229,24 +232,28 @@ class Puzzle_slider(object):
 		list_BFS.append(matrix)
 
 		while not status_compare:
-
+			depth = depth + 1
 			i,j = self.position_free(matrix)
 			list_moviment_free = self.move_free(i,j)
 
 			for moviment in list_moviment_free:
 				matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
 				list_procs.append(matrix_aux)
+				list_BFS_level.append(depth)
 
 			matrix = list_procs.pop(0)
+			depth_final =  list_BFS_level.pop(0)
 			status_compare = self.compare_matrix(matrix)
 			list_BFS.append(matrix)
 
+		print(depth_final)
 		return matrix
 
 	def Iterative_Depth_Search(self, matrix, level):
 		list_procs = []
 		list_IDS = []
 		list_IDS_aux = []
+		list_IDS_level = []
 		depth = 0
 
 		list_procs.append(matrix)
@@ -256,34 +263,48 @@ class Puzzle_slider(object):
 		list_IDS.append(matrix)
 
 		while not status_compare:
-			
 			aux=0
+			depth = depth +1
 			i,j = self.position_free(matrix)
 			list_moviment_free = self.move_free(i,j)
 
-			for moviment in list_moviment_free:
-    			
-				matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
-				if aux != 0:
-					list_procs.append(matrix_aux)
-					#print("Entrou")
-				else:
-					matrix = matrix_aux
-				aux = aux+1
-
+		
 			if depth == level:
-				matrix = list_procs.pop(0)
-				depth = 0
+				#print(list_procs.pop(0))
+			
+				if list_procs != None:
+					matrix = list_procs.pop(0)
+					print(matrix)
+					depth = list_IDS_level.pop(0)
+				else:
+					print("Lista vazia")
+				#print("entrou", depth)    				
+			
+			else:
+				for moviment in list_moviment_free:
+        			
+					matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
+					if aux != 0:
+						list_procs.append(matrix_aux)
+						list_IDS_level.append(depth)
+						#print("Entrou")
+					else:		# Faz a busca em profundidade
+						matrix_aux2 = matrix_aux
+					aux = aux+1
+					
+				matrix = matrix_aux2
+
 
 			list_IDS.append(matrix)
 			status_compare = self.compare_matrix(matrix)
-			depth = depth +1
+			#depth = depth +1
 
+		#print(depth)
 		return matrix
 
 Puzzle = Puzzle_slider(3)
 
-matrix_reordered = Puzzle.matrix_reorder_all(10, Puzzle.get_matrix_origin())
+matrix_reordered = Puzzle.matrix_reorder_all(3, Puzzle.get_matrix_origin())
 print(matrix_reordered)
 
 print("DFS:")
@@ -302,7 +323,7 @@ Puzzle.print_t(matrix_BFS)
 
 print("IDS:")
 t0 = time.time()
-matrix_IDS = Puzzle.Iterative_Depth_Search(copy.deepcopy(matrix_reordered), 300)
+matrix_IDS = Puzzle.Iterative_Depth_Search(copy.deepcopy(matrix_reordered), 20)
 t1 = time.time()
 print ("Total time running: %s seconds" %(str(t1-t0)))
 Puzzle.print_t(matrix_IDS)

@@ -270,11 +270,48 @@ class Puzzle_slider(object):
 
 			depth = depth +1
 
-		#for ju in list_BFS:
-		#	print(ju)
-		#print(list_BFS)
-
 		return son
+
+
+		
+
+		def Iterative_Depth_Search(self, matrix, level):
+    		list_procs = []
+		list_IDS = []
+		list_IDS_aux = []
+		depth = 0
+
+		list_procs.append(matrix)
+		matrix = list_procs.pop()
+
+		status_compare = self.compare_matrix(matrix)
+		list_IDS.append(matrix)
+
+		while not status_compare:
+			
+			aux=0
+			i,j = self.position_free(matrix)
+			list_moviment_free = self.move_free(i,j)
+
+			for moviment in list_moviment_free:
+    			
+				matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
+				if aux != 0:
+					list_procs.append(matrix_aux)
+					#print("Entrou")
+				else:
+					matrix = matrix_aux
+				aux = aux+1
+
+			if depth == level:
+				matrix = list_procs.pop(0)
+				depth = 0
+
+			list_IDS.append(matrix)
+			status_compare = self.compare_matrix(matrix)
+			depth = depth +1
+
+		return matrix
 
 
 
