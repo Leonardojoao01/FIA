@@ -17,25 +17,25 @@ class Puzzle_slider(object):
 
 	# Verificar se os dados passados são válidos(size. date)
 	def __init__(self, size, date=None):
-    		self.size = size
+		self.size = size
 		if date is not None:
-    			self.create_matrix_with_date(size, date)
+			self.create_matrix_with_date(size, date)
 		else:
-    			self.create_matrix_without_date(size)
+			self.create_matrix_without_date(size)
 
 	def get_matrix_origin(self):
-    		return self.matrix_origin
+		return self.matrix_origin
 
 	def get_matrix_compare(self):
-    		return self.matrix_compare
+		return self.matrix_compare
 
 
 	def create_matrix(self, size):
-    		self.matrix_origin = [0]*size
+		self.matrix_origin = [0]*size
 		self.matrix_compare = [0] * size
 
 		for i in range(size):
-    			self.matrix_origin[i] = [0] * size
+			self.matrix_origin[i] = [0] * size
 			self.matrix_compare[i] = [0] * size
 		
 

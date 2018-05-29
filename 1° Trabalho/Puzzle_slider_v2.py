@@ -273,8 +273,8 @@ class Puzzle_slider(object):
 		list_IDS_level = []
 		depth = 0
 
-		list_procs.append(no.get_data())	# Adiciona na lista o nó a ser processado
-		matrix = list_procs.pop()
+		list_procs.append(no)	# Adiciona na lista o nó a ser processado
+		matrix = list_procs.pop().get_data()
 
 		status_compare = self.compare_matrix(matrix)
 		list_IDS.append(matrix)
@@ -288,31 +288,35 @@ class Puzzle_slider(object):
 			
 			if depth == level:			
 				if list_procs != None:
-					matrix = list_procs.pop(0)
-					depth = list_IDS_level.pop(0)
-						
+					no = list_procs.pop(0)
+					matrix = no.get_data()
+					depth = no.get_level()
 				else:
-					print("Lista vazia")			
+					print("Lista vazia")	
+
 			else:
 				for moviment in list_moviment_free:
 						
 					matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
 					if aux != 0:
-						list_procs.append(matrix_aux)
-						list_IDS_level.append(depth)
-						son = No(copy.deepcopy(matrix_aux), level=depth)
+						son = No(copy.deepcopy(matrix_aux), level=depth)	
+						list_procs.append(son)
+						no.set_leaf(son)
+						son.set_father(no)
+						#list_IDS_level.append(depth)
+						
 					else:		# Faz a busca em profundidade
-						matrix_aux2 = matrix_aux
-						son = No(copy.deepcopy(matrix_aux), level=depth)
-
-					no.set_leaf(son)
-					son.set_father(no)
+						#matrix_aux2 = matrix_aux
+						son_aux = No(copy.deepcopy(matrix_aux), level=depth)
+						no.set_leaf(son_aux)
+						son_aux.set_father(no)
 
 					aux = aux+1
 
-				matrix = matrix_aux2
+				#matrix = matrix_aux2
+				no = son_aux
 
-
+			matrix = no.get_data()
 			list_IDS.append(matrix)
 			status_compare = self.compare_matrix(matrix)
 			#depth = depth +1
@@ -327,7 +331,7 @@ Puzzle = Puzzle_slider(3)
 #Puzzle_2 = copy.deepcopy(Puzzle)
 
 
-matrix_reordered = Puzzle.matrix_reorder_all(3, Puzzle.get_father_of_all().get_data())
+matrix_reordered = Puzzle.matrix_reorder_all(10, Puzzle.get_father_of_all().get_data())
 print("Matriz entrada: ")
 print(matrix_reordered)
 print("")
