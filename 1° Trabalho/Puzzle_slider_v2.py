@@ -2,6 +2,7 @@
 #!/usr/bin/python
 
 from Tree import No
+from memory_profiler import memory_usage
 import copy
 import random
 import time

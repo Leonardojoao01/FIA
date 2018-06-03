@@ -1,6 +1,7 @@
 # -*- encoding:utf-8 -*-
 #!/usr/bin/python
 
+from memory_profiler import memory_usage
 import copy
 import random
 import time
@@ -40,12 +41,12 @@ class Puzzle_slider(object):
 		
 
 	def create_matrix_without_date(self, size):
-    		aux = 1
+		aux = 1
 		self.create_matrix(size)
 
 		for i in range(size):
-    			for j in range(size):
-    				self.matrix_origin[i][j] = aux+j
+			for j in range(size):
+				self.matrix_origin[i][j] = aux+j
 				self.matrix_compare[i][j] = aux+j
 			aux = aux + size
 
@@ -64,10 +65,10 @@ class Puzzle_slider(object):
 
 	# Retorna a posição onde está o ZERO
 	def position_free(self, matrix):
-    		for i in range(self.size):
-    			for j in range(self.size):
-    				if matrix[i][j] == 0:
-    					return i,j
+		for i in range(self.size):
+			for j in range(self.size):
+   				if matrix[i][j] == 0:
+   					return i,j
 			
 		return None
 
@@ -78,12 +79,12 @@ class Puzzle_slider(object):
 		positions = []
 
 		if i==0 and j==0:
-    			positions.append(1)
+			positions.append(1)
 			positions.append(3)
 			return positions
 			#return 1,None,3,None
 		elif i==0 and j!= self.size-1:
-    			positions.append(1)
+			positions.append(1)
 			positions.append(3)
 			positions.append(4)
 			return positions
@@ -95,19 +96,19 @@ class Puzzle_slider(object):
 			return positions
 
 		elif i!=self.size-1 and j==0:
-    			positions.append(1)
+			positions.append(1)
 			positions.append(2)
 			positions.append(3)
 			return positions
 			#return 1,2,3,None
 		elif i==self.size-1 and j==0:
-    			positions.append(2)
+			positions.append(2)
 			positions.append(3)
 			return positions
 			#return None,2,3,None
 
 		elif i!=self.size-1 and j!=self.size-1:
-    			positions.append(1)
+			positions.append(1)
 			positions.append(3)
 			positions.append(2)
 			positions.append(4)
@@ -115,21 +116,21 @@ class Puzzle_slider(object):
 			#return 1,2,None,4
 
 		elif i==self.size-1 and j!=self.size-1:
-    			positions.append(2)
+			positions.append(2)
 			positions.append(3)
 			positions.append(4)
 			return positions
 			#return None,2,3,4
 
 		elif i==self.size-1 and j==self.size-1:
-    			positions.append(2)
+			positions.append(2)
 			positions.append(4)
 			return positions
 
 
 
 		elif i!=self.size-1 and j==self.size-1:
-    			positions.append(1)
+			positions.append(1)
 			positions.append(2)
 			positions.append(4)
 			return positions
@@ -140,25 +141,25 @@ class Puzzle_slider(object):
 
 
 	def matrix_reorder(self, amount, matrix, p_free_i, p_free_j):
-    		matrix_aux = copy.copy(matrix)
+		matrix_aux = copy.copy(matrix)
 		if amount == 1:
-    			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i+1][p_free_j]
+			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i+1][p_free_j]
 			matrix_aux[p_free_i+1][p_free_j] = 0
 
 		elif amount == 2:
-    			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i-1][p_free_j]
+			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i-1][p_free_j]
 			matrix_aux[p_free_i-1][p_free_j] = 0
 
 		elif amount == 3:
-    			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i][p_free_j+1]
+			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i][p_free_j+1]
 			matrix_aux[p_free_i][p_free_j+1] = 0
 
 		elif amount == 4:
-    			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i][p_free_j-1]
+			matrix_aux[p_free_i][p_free_j] = matrix_aux[p_free_i][p_free_j-1]
 			matrix_aux[p_free_i][p_free_j-1] = 0
 
 		else:
-    			print("Movimento ilegal")
+			print("Movimento ilegal")
 
 		return matrix_aux
 
@@ -257,6 +258,7 @@ class Puzzle_slider(object):
 		list_IDS = []
 		list_IDS_aux = []
 		list_IDS_level = []
+		list_IDS_level_aux = []
 		depth = 0
 
 		list_procs.append(matrix)
@@ -267,34 +269,47 @@ class Puzzle_slider(object):
 
 		while not status_compare:
 			aux=0
-			depth = depth +1
-			i,j = self.position_free(matrix)
-			list_moviment_free = self.move_free(i,j)
+			#depth = depth +1
+			#i,j = self.position_free(matrix)
+			#list_moviment_free = self.move_free(i,j)
 
-		
 			if depth == level:			
-				if list_procs != None:
-					matrix = list_procs.pop(0)
-					depth = list_IDS_level.pop(0)
+				if len(list_procs) != 0:
+					#matrix = list_procs.pop(0)
+					#depth = list_IDS_level.pop(0)
+					list_IDS_aux.append(matrix)
+					list_IDS_level_aux.append(depth)
+
+					matrix = list_procs.pop()
+					depth = list_IDS_level.pop()
+
+					#list_IDS_aux.append(matrix)
+					#list_IDS_level_aux.append(depth)
 
 				else:
-					print("Lista vazia")			
-			else:
+					print("Lista vazia", len(list_IDS_aux), len(list_IDS_level_aux))
+					
+					break
+			i,j = self.position_free(matrix)
+			list_moviment_free = self.move_free(i,j)
+			depth = depth+1
+
+			if depth != level:
 				for moviment in list_moviment_free:
         			
 					matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
-					if aux != 0:
+					if aux != 0 :
 						list_procs.append(matrix_aux)
 						list_IDS_level.append(depth)
-						#print("Entrou")
 					else:		# Faz a busca em profundidade
 						matrix_aux2 = matrix_aux
+						list_IDS.append(matrix_aux)
 					aux = aux+1
+				
+				#print("Level: ", depth)
 
 				matrix = matrix_aux2
-
-
-			list_IDS.append(matrix)
+				#list_IDS.append(matrix)
 			status_compare = self.compare_matrix(matrix)
 			#depth = depth +1
 
@@ -303,17 +318,21 @@ class Puzzle_slider(object):
 
 Puzzle = Puzzle_slider(3)
 
-matrix_reordered = Puzzle.matrix_reorder_all(3, Puzzle.get_matrix_origin())
+matrix_reordered = Puzzle.matrix_reorder_all(10, Puzzle.get_matrix_origin())
 print(matrix_reordered)
 
+#mem_usage = memory_usage(f)
 
 print("DFS:")
 t0 = time.time()
 matrix_DFS = Puzzle.Depth_First_Search(copy.deepcopy(matrix_reordered))
+#mem_usage = memory_usage(Puzzle.Depth_First_Search(copy.deepcopy(matrix_reordered)))
 t1 = time.time()
 print ("Total time running: %s seconds" %(str(t1-t0)))
 Puzzle.print_t(matrix_DFS)
 
+#print('Memory usage (in chunks of .1 seconds): %s' % mem_usage)
+#print('Maximum memory usage: %s' % max(mem_usage))
 
 print("BSF:")
 t0 = time.time()
@@ -325,7 +344,7 @@ Puzzle.print_t(matrix_BFS)
 
 print("IDS:")
 t0 = time.time()
-matrix_IDS = Puzzle.Iterative_Depth_Search(copy.deepcopy(matrix_reordered), 20)
+matrix_IDS = Puzzle.Iterative_Depth_Search(copy.deepcopy(matrix_reordered), 10)
 t1 = time.time()
 print ("Total time running: %s seconds" %(str(t1-t0)))
 Puzzle.print_t(matrix_IDS)
