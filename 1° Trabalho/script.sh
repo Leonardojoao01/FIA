@@ -1,35 +1,38 @@
 #!/bin/bash
 echo 'Running Script'   
 i=0
+j=0
+k=0
+l=0
 
-echo "DSF:"
+# echo "DFS: "
+# while [ $i -lt 1 ]
+# do
+#     eval $"python3 main.py DFS"
+#     i=$[$i+1] 
+#     echo ""
+# done
 
-while [ $i -lt 5 ]
+echo "BFS: "
+while [ $j -lt 1 ]
 do
-    eval $"python3 main_DSF.py" #>> log.txt
-    i=$[$i+1] 
-    echo $"\n"
+    eval $"python3 main.py BFS"
+    j=$[$j+1] 
+    echo ""
 done
-echo $"\n\n"
-i=0
 
-echo "BSF"
-
-while [ $i -lt 5 ]
+echo "IDS: "
+while [ $k -lt 1 ]
 do
-    eval $"python3 main_BSF.py" #>> log.txt
-    i=$[$i+1] 
-    echo $"\n"
+    eval $"python3 main.py IDS"
+    k=$[$k+1] 
+    echo ""
 done
 
-echo $"\n\n"
-i=0
-
-echo "IDS"
-
-while [ $i -lt 5 ]
-do
-    eval $"python3 main_IDS.py" #>> log.txt
-    i=$[$i+1] 
-    echo $"\n"
-done
+# echo "A_star: "
+# while [ $l -lt 1 ]
+# do
+#     eval $"python3 main.py A_star"
+#     l=$[$l+1] 
+#     echo ""
+# done

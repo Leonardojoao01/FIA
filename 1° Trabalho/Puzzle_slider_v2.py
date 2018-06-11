@@ -36,6 +36,9 @@ class Puzzle_slider(object):
     def get_father_of_all(self):
         return self.father_of_all
 
+    def set_father_of_all(self, matrix):
+        self.father_of_all.set_data(matrix)# = matrix
+
 
     def create_matrix(self):
         self.matrix_origin = [0]*self.size
@@ -54,9 +57,11 @@ class Puzzle_slider(object):
             aux = aux + self.size
 
         self.matrix_origin[self.size-1][self.size-1]=0
+
+       # self.matrix_origin = [[0, 6, 2,], [1, 3, 8,], [4, 7, 5,]]
         self.matrix_compare = copy.deepcopy(self.matrix_origin)
 
-        self.father_of_all = copy.deepcopy(No(self.matrix_compare, level=0)) # Verificar a utilização do DEEP
+        self.father_of_all = copy.deepcopy(No(self.matrix_compare, level=0))
 
 
 
@@ -276,26 +281,31 @@ class Puzzle_slider(object):
 
         list_procs.append(no)	# Adiciona na lista o nó a ser processado
         matrix = list_procs.pop().get_data()
+        print("MATRIIXXX: ", matrix)
 
         status_compare = self.compare_matrix(matrix)
         list_IDS.append(matrix)
+        #print("Matrix: ",matrix)
 
         while not status_compare:
             aux=0
-            depth = depth +1
-            i,j = self.position_free(matrix)
-            list_moviment_free = self.move_free(i,j)
-
-            
+            #print("Entrou")
             if depth == level:			
                 if list_procs != None:
-                    no = list_procs.pop(0)
+                    list_IDS_aux.append(no)
+
+                    no = list_procs.pop()
                     matrix = no.get_data()
                     depth = no.get_level()
                 else:
-                    print("Lista vazia")	
+                    print("Lista vazia")
 
-            else:
+            depth = depth +1
+            i,j = self.position_free(matrix)
+            list_moviment_free = self.move_free(i,j)	
+
+            
+            if depth != level and depth < level-1:
                 for moviment in list_moviment_free:
                         
                     matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
@@ -304,20 +314,18 @@ class Puzzle_slider(object):
                         list_procs.append(son)
                         no.set_leaf(son)
                         son.set_father(no)
-                        #list_IDS_level.append(depth)
                         
                     else:		# Faz a busca em profundidade
-                        #matrix_aux2 = matrix_aux
                         son_aux = No(copy.deepcopy(matrix_aux), level=depth)
                         no.set_leaf(son_aux)
                         son_aux.set_father(no)
 
                     aux = aux+1
 
-                #matrix = matrix_aux2
                 no = son_aux
 
             matrix = no.get_data()
+            print("Matrix: "+str(matrix)+"Depth: "+str(depth))
             list_IDS.append(matrix)
             status_compare = self.compare_matrix(matrix)
             #depth = depth +1
@@ -337,16 +345,16 @@ print("Matriz entrada: ")
 print(matrix_reordered)
 print("")
 
-print("DFS:")
-# Envia o objeto pai da árvore, p os filhos acessarem
-t0 = time.time()
-matrix_DFS = Puzzle.Depth_First_Search(copy.deepcopy(Puzzle.get_father_of_all()))#copy.deepcopy(matrix_reordered))
-t1 = time.time()
+# print("DFS:")
+# # Envia o objeto pai da árvore, p os filhos acessarem
+# t0 = time.time()
+# matrix_DFS = Puzzle.Depth_First_Search(copy.deepcopy(Puzzle.get_father_of_all()))#copy.deepcopy(matrix_reordered))
+# t1 = time.time()
 
 
-print(matrix_DFS.get_data())
-print(matrix_DFS.get_level())
-print ("Total time running: %s seconds" %(str(t1-t0)))
+# print(matrix_DFS.get_data())
+# print(matrix_DFS.get_level())
+# print ("Total time running: %s seconds" %(str(t1-t0)))
 
 #Resolver esse problema
 
@@ -354,21 +362,24 @@ print ("Total time running: %s seconds" %(str(t1-t0)))
 #print(matrix_reordered)
 
 #print(Puzzle.get_father_of_all().get_data())
-print("BSF:")
-t0 = time.time()
-matrix_BFS = Puzzle.Breadth_First_Search(copy.deepcopy(Puzzle.get_father_of_all()))
-t1 = time.time()
+# print("BSF:")
+# t0 = time.time()
+# matrix_BFS = Puzzle.Breadth_First_Search(copy.deepcopy(Puzzle.get_father_of_all()))
+# t1 = time.time()
 
-print(matrix_BFS.get_data())
-print(matrix_BFS.get_level())
+# print(matrix_BFS.get_data())
+# print(matrix_BFS.get_level())
 
-print("Total time running: %s seconds" %(str(t1-t0)))
+# print("Total time running: %s seconds" %(str(t1-t0)))
 
+#juca = [[0, 6, 2,], [1, 3, 8,], [4, 7, 5,]]
+juca = [[1, 2, 3,], [4, 5, 6,], [0, 7, 8,]]
 
+Puzzle.set_father_of_all(juca)
 
 print("IDS:")
 t0 = time.time()
-matrix_IDS = Puzzle.Iterative_Depth_Search(copy.deepcopy(Puzzle.get_father_of_all()), 20)
+matrix_IDS = Puzzle.Iterative_Depth_Search(copy.deepcopy(Puzzle.get_father_of_all()), 13)
 print(matrix_IDS.get_data())
 print(matrix_IDS.get_level())
 #matrix_IDS = Puzzle.Iterative_Depth_Search(copy.deepcopy(Puzzle.get_father_of_all()), 20)
