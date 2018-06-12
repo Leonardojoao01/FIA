@@ -9,14 +9,18 @@ import time
 
 class Puzzle_slider(object):
 
-    matrix_origin = None
-    matrix_compare = None
-    size = None
+    #matrix_origin = None
+    #matrix_compare = None
+    #size = None
 
-    father_of_all = None		# Serve para algo
+    
 
-    list_DFS = []
-    list_BFS = []
+    list_DFS    = []
+    list_BFS    = []
+    list_IDS    = []
+    list_A_star = []
+
+    father_of_all = None
 
 
     # Verificar se os dados passados são válidos(size. date)
@@ -305,7 +309,7 @@ class Puzzle_slider(object):
             list_moviment_free = self.move_free(i,j)	
 
             
-            if depth != level and depth < level-1:
+            if depth != level and depth <= level:
                 for moviment in list_moviment_free:
                         
                     matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)

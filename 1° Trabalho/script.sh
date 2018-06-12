@@ -8,6 +8,14 @@ l=0
 # echo "DFS: "
 # while [ $i -lt 1 ]
 # do
+#     eval $"python3 main.py"
+#     i=$[$i+1] 
+#     echo ""
+# done
+
+# echo "DFS: "
+# while [ $i -lt 1 ]
+# do
 #     eval $"python3 main.py DFS"
 #     i=$[$i+1] 
 #     echo ""

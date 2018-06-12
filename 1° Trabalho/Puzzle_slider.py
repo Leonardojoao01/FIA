@@ -2,34 +2,41 @@
 #!/usr/bin/python
 
 from memory_profiler import memory_usage
+from Tree import No
 import copy
 import random
 import time
-import os
-import psutil
-import gc, sys
-import resource
+#import os
+#import psutil
+#import gc, sys
+#import resource
 import heapq
 
 class Puzzle_slider(object):
     
-    matrix_origin = None
-    matrix_compare = None
+    # matrix_origin = None
+    # matrix_compare = None
 
-    size = None
-    fila_1 = None
-    indice_1 = None
+    # size = None
 
-    fila_2 = None
-    indice_2 = None
+    # fila_1 = None
+    # indice_1 = None
+
+    # fila_2 = None
+    # indice_2 = None
+
+    list_DFS    = []
+    list_BFS    = []
+    list_IDS    = []
+    list_A_star = []
 
     # Verificar se os dados passados são válidos(size. date)
     def __init__(self, size, date=None):
-        self.size = size
+        self.size     = size
 
-        self.fila_1 = []
+        self.fila_1   = []
         self.indice_1 = 0
-        self.fila_2 = []
+        self.fila_2   = []
         self.indice_2 = 0
 
         if date is not None:
@@ -43,21 +50,21 @@ class Puzzle_slider(object):
     def get_matrix_compare(self):
         return self.matrix_compare
 
-    # ======Fila de prioridade======
+    # ================Fila de prioridade da matrix================
     def inserir_matrix(self, item, prioridade):
         heapq.heappush(self.fila_1, (prioridade, self.indice_1, item))
         self.indice_1 += 1
 
     def remover_matrix(self):
         return heapq.heappop(self.fila_1)[-1]
-    #===============================
+    #=======Fila de prioridade do depth relacionado a matrix=======
     def inserir_depth(self, item, prioridade):
         heapq.heappush(self.fila_2, (prioridade, self.indice_2, item))
         self.indice_2 += 1
 
     def remover_depth(self):
         return heapq.heappop(self.fila_2)[-1]
-    #===============================
+    #==============================================================
 
     def create_matrix(self, size):
         self.matrix_origin = [0]*size
@@ -78,18 +85,15 @@ class Puzzle_slider(object):
                 self.matrix_compare[i][j] = aux+j
             aux = aux + size
 
-        #juca = self.matrix_origin
-
         self.matrix_origin[size-1][size-1]=0
         self.matrix_compare[size-1][size-1]=0
-        #self.matrix_compare = self.ma
 
         return self.matrix_origin
 
-        #print(self.matrix)
 
     def create_matrix_with_date(self, size, date):
             return None
+
 
     # Retorna a posição onde está o ZERO
     def position_free(self, matrix):
@@ -102,8 +106,7 @@ class Puzzle_slider(object):
 
     #	1 = up_down; 	2 = down_up;	3 = left_right;		4 = right_left
     def move_free(self, i,j):
-            #i,j = self.return_position_free()
-
+        
         positions = []
 
         if i==0 and j==0:
@@ -197,23 +200,20 @@ class Puzzle_slider(object):
 
         #return self.matrix
 
+
     def matrix_reorder_all(self, amount, matrix):
     
         for iterations in range(amount):
-                #print("======Rodada {} ======".format(iterations))
             i,j = self.position_free(matrix)
             list_moviment_free = self.move_free(i,j)
 
             moviment = random.choice(list_moviment_free)
-            #print("Movimento", moviment)
             self.matrix_reorder(moviment, matrix, i,j)
 
         return matrix
 
-    # Criar a matriz generica p/ comparar
 
     def compare_matrix(self, matrix_process):
-            #matrix_compare = [[1,2,3,4,],[5,6,7,8,],[9,10,11,0,]]
         status = False
         if self.matrix_compare == matrix_process:
                 status = True
@@ -223,7 +223,7 @@ class Puzzle_slider(object):
     
     def Depth_First_Search(self, matrix):
         list_procs = []
-        list_DFS = []
+        #list_DFS = []
         depth = 0
 
         list_procs.append(matrix)
@@ -232,7 +232,7 @@ class Puzzle_slider(object):
         status_compare = self.compare_matrix(matrix)
 
         while not status_compare:
-            list_DFS.append(matrix)
+            self.list_DFS.append(matrix)
 
             i,j = self.position_free(matrix)
             list_moviment_free = self.move_free(i,j)
@@ -246,12 +246,13 @@ class Puzzle_slider(object):
             status_compare = self.compare_matrix(matrix)
             depth = depth +1
 
+        self.list_DFS.append(matrix)
         print(depth)
         return matrix
     
     def Breadth_First_Search(self, matrix):
         list_procs = []
-        list_BFS = []
+        #self.list_BFS = []
         list_BFS_level = []
         depth = 0
         #depth_final = 0
@@ -261,9 +262,10 @@ class Puzzle_slider(object):
 
         status_compare = self.compare_matrix(matrix)
 
-        list_BFS.append(matrix)
+        #self.list_BFS.append(matrix)
 
         while not status_compare:
+            self.list_BFS.append(matrix)
             depth = depth + 1
             i,j = self.position_free(matrix)
             list_moviment_free = self.move_free(i,j)
@@ -276,67 +278,40 @@ class Puzzle_slider(object):
             matrix = list_procs.pop(0)
             depth =  list_BFS_level.pop(0)
             status_compare = self.compare_matrix(matrix)
-            list_BFS.append(matrix)
+            self.list_BFS.append(matrix)
 
         print(depth)
+        self.list_BFS.append(matrix)
         return matrix
     
     def Iterative_Depth_Search(self, matrix, level):
         list_procs = []
-        list_IDS = []
-        list_IDS_aux = []
-        list_IDS_level = []
-        list_IDS_level_aux = []
+        self.list_IDS = []
         depth = 0
 
-        list_procs.append(matrix)
-        matrix = list_procs.pop()
-
+        self.list_IDS.append(matrix)
         status_compare = self.compare_matrix(matrix)
-        list_IDS.append(matrix)
 
-        while not status_compare:
-            aux=0
+        while depth <= level and not status_compare:
+            depth = depth + 1
 
-            if depth == level:			
-                if len(list_procs) != 0:
-                    list_IDS_aux.append(matrix)
-                    list_IDS_level_aux.append(depth)
+            while len(self.list_IDS) != 0:
+                matrix = self.list_IDS.pop()
 
-                    matrix = list_procs.pop()
-                    depth = list_IDS_level.pop()
-
-                else:
-                    print("Lista vazia", len(list_IDS_aux), len(list_IDS_level_aux))
-                    break
-
-            i,j = self.position_free(matrix)
-            list_moviment_free = self.move_free(i,j)
-            depth = depth+1
-
-            if depth != level and depth < level-1:
+                i,j = self.position_free(matrix)
+                list_moviment_free = self.move_free(i,j)
                 for moviment in list_moviment_free:
-                    
                     matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
-                    if aux != 0 :
-                        list_procs.append(matrix_aux)
-                        list_IDS_level.append(depth)
-                    else:		# Faz a busca em profundidade
-                        matrix_aux2 = matrix_aux
-                        list_IDS.append(matrix_aux)
-                    aux = aux+1
-                
-                #print("Level: ", depth)
+                    list_procs.append(matrix_aux)
+            
+            for matrix in list_procs:
+                self.list_IDS.append(matrix)
+                status_compare_aux = self.compare_matrix(matrix)
+                if status_compare_aux:
+                    status_compare = True
 
-                matrix = matrix_aux2
-                #list_IDS.append(matrix)
-            print("Matrix: "+str(matrix)+"Depth: "+str(depth))
-
-            status_compare = self.compare_matrix(matrix)
-            #depth = depth +1
-
-        print(depth)
-        return matrix
+        print(depth)  
+        return matrix    
 
     def heuristic_1(self, matrix):
         h=0    
@@ -350,13 +325,22 @@ class Puzzle_slider(object):
 
         return h
     
-    def heuristica(self, puzzle):
+    def heuristic_2(self, puzzle):
         distanciaManhattanTotal = 0
           
         for i in range(self.size):
             for j in range(self.size):
                 if puzzle[i][j] == 0: continue
                 distanciaManhattanTotal += abs(i - (puzzle[i][j]/4)) + abs(j -  (puzzle[i][j]%4));
+        return distanciaManhattanTotal
+
+    def heuristic_3(self, puzzle):
+        distanciaManhattanTotal = 0
+          
+        for i in range(self.size):
+            for j in range(self.size):
+                if puzzle[i][j] == 0: continue
+                distanciaManhattanTotal += abs(i - (puzzle[i][j]/4)) * abs(j -  (puzzle[i][j]%4));
         return distanciaManhattanTotal
 
     def A_star(self, matrix, heuristic):
@@ -371,29 +355,30 @@ class Puzzle_slider(object):
         self.inserir_matrix(matrix, value_heuristic)
         matrix = self.remover_matrix()
 
-        value_heuristic = self.heuristica(matrix)
-        print("value_heuristic:", value_heuristic)
+        # value_heuristic = self.heuristica(matrix)
+        # print("value_heuristic:", value_heuristic)
 
-        value_heuristic = self.heuristic_1(matrix)
-        print("value_heuristic:", value_heuristic)
+        # value_heuristic = self.heuristic_1(matrix)
+        # print("value_heuristic:", value_heuristic)
         
-        # while not status_compare:
-        #     i,j = self.position_free(matrix)
-        #     list_moviment_free = self.move_free(i,j)
+        while not status_compare:
+            i,j = self.position_free(matrix)
+            list_moviment_free = self.move_free(i,j)
 
-        #     for moviment in list_moviment_free:
-        #         matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
+            for moviment in list_moviment_free:
+                matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
 
-        #         value_heuristic = self.heuristic_1(matrix_aux)
-        #         F = depth *10 + value_heuristic
-        #         self.inserir_matrix(matrix_aux, F)
-        #         self.inserir_depth(depth+1, F)
+                value_heuristic = self.heuristic_3(matrix_aux)
+                F = depth *10 + value_heuristic
+                self.inserir_matrix(matrix_aux, F)
+                self.inserir_depth(depth+1, F)
 
-        #     matrix = self.remover_matrix()
-        #     depth = self.remover_depth()
-        #     list_A_star.append(matrix)
-        #     status_compare = self.compare_matrix(matrix)
-            
+            matrix = self.remover_matrix()
+            depth = self.remover_depth()
+            list_A_star.append(matrix)
+            status_compare = self.compare_matrix(matrix)
+        
+        print(depth)
         return matrix
 
 
