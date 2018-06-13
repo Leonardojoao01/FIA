@@ -9,20 +9,15 @@ import sys
 
 Puzzle = Puzzle_slider(3)
 
-#matrix = [[0, 6, 2,], [1, 3, 8,], [4, 7, 5,]]
-#matrix = [[1, 2, 3,], [4, 5, 6,], [0, 7, 8,]]
-#matrix = [[1, 2, 3,], [4, 5, 0,], [7, 8, 6,]]
-#matrix = [[8, 1, 3,], [4, 0, 2,], [7, 6, 5,]]
-
-#matrix = Puzzle.matrix_reorder_all(10, Puzzle.get_matrix_origin())
+#matrix = Puzzle.matrix_reorder_all(20, Puzzle.get_matrix_origin())
 #print(matrix)
 
-matrix = [[1, 6, 2], [5, 3, 8], [4, 7, 0]]
+#matrix = [[1, 3, 5], [4, 0, 2], [7, 8, 6]]         # 6 Movimentos
+#matrix = [[1, 6, 2], [5, 3, 8], [4, 7, 0]]         # 8 Movimentos
+#matrix = [[0, 1, 2], [4, 5, 8], [7, 6, 3]]         # 10 Movimentos
+matrix = [[0, 2, 3], [1, 6, 8], [7, 5, 4]]         # 12 Movimentos
+#matrix = [[1, 2, 0], [4, 5, 3], [6, 7, 8]]         # 14 Movimentos
 
-
-#Puzzle = Puzzle_slider(3)
-
-#print(sys.argv[1])
 
 if str(sys.argv[1]) == "DFS":
     t0 = time.time()

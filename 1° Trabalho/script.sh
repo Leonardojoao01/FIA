@@ -5,42 +5,34 @@ j=0
 k=0
 l=0
 
-# echo "DFS: "
-# while [ $i -lt 1 ]
+#echo "DFS: "
+# while [ $i -lt 30 ]
 # do
-#     eval $"python3 main.py"
+#     eval $"python3 main.py DFS >> log1.txt"
 #     i=$[$i+1] 
 #     echo ""
 # done
 
-# echo "DFS: "
-# while [ $i -lt 1 ]
+# #echo "BFS: "
+# while [ $j -lt 30 ]
 # do
-#     eval $"python3 main.py DFS"
-#     i=$[$i+1] 
+#     eval $"python3 main.py BFS >> log2.txt"
+#     j=$[$j+1] 
 #     echo ""
 # done
 
-echo "BFS: "
-while [ $j -lt 1 ]
-do
-    eval $"python3 main.py BFS"
-    j=$[$j+1] 
-    echo ""
-done
-
-echo "IDS: "
-while [ $k -lt 1 ]
-do
-    eval $"python3 main.py IDS"
-    k=$[$k+1] 
-    echo ""
-done
-
-# echo "A_star: "
-# while [ $l -lt 1 ]
+#echo "IDS: "
+# while [ $k -lt 30 ]
 # do
-#     eval $"python3 main.py A_star"
-#     l=$[$l+1] 
+#     eval $"python3 main.py IDS >> log3.txt"
+#     k=$[$k+1] 
 #     echo ""
 # done
+
+echo "A_star: "
+while [ $l -lt 30 ]
+do
+    eval $"python3 main.py A_star >> log4.txt"
+    l=$[$l+1] 
+    echo ""
+done
