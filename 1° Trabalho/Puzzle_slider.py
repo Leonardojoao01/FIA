@@ -358,33 +358,20 @@ class Puzzle_slider(object):
 
     def heuristic_difference_points(self, matrix):
         h=0    
-        for x in range(self.size):
-            for y in range(self.size):
-                if matrix[x][y] != (self.size*x + y+1):
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.matrix_compare[i][j] != matrix[i][j] and matrix[i][j] != 0:
                     h +=1
-        
-        if matrix[self.size-1][self.size-1] == 0:
-            h -=1
-
         return h
     
-    def heuristic_Manhattan(self, puzzle):
+    def heuristic_Manhattan(self, matrix):
         distanciaManhattanTotal = 0
           
         for i in range(self.size):
             for j in range(self.size):
-                if puzzle[i][j] == 0: continue
-                distanciaManhattanTotal += abs(i - (puzzle[i][j]/4)) * abs(j -  (puzzle[i][j]%4));
+                if self.matrix_compare[i][j] != matrix[i][j] and matrix[i][j] != 0: 
+                    distanciaManhattanTotal += abs(i - (matrix[i][j]/4)) + abs(j -  (matrix[i][j]%4));
         return distanciaManhattanTotal
-
-    # def heuristic_3(self, puzzle):
-    #     distanciaManhattanTotal = 0
-          
-    #     for i in range(self.size):
-    #         for j in range(self.size):
-    #             if puzzle[i][j] == 0: continue
-    #             distanciaManhattanTotal += abs(i - (puzzle[i][j]/4)) * abs(j -  (puzzle[i][j]%4));
-    #     return distanciaManhattanTotal
 
     def A_star(self, matrix, heuristic):
         list_A_star = []
@@ -394,7 +381,7 @@ class Puzzle_slider(object):
         status_compare = self.compare_matrix(matrix)
         list_A_star.append(matrix)
 
-        value_heuristic = self.heuristic_difference_points(matrix)
+        value_heuristic = self.heuristic_Manhattan(matrix)
         self.inserir_matrix(matrix, value_heuristic)
         matrix = self.remover_matrix()
         
@@ -405,7 +392,7 @@ class Puzzle_slider(object):
             for moviment in list_moviment_free:
                 matrix_aux = self.matrix_reorder(moviment, copy.deepcopy(matrix), i,j)
 
-                value_heuristic = self.heuristic_difference_points(matrix_aux)
+                value_heuristic = self.heuristic_Manhattan(matrix_aux)
                 #F = depth *10 + value_heuristic
                 F = depth + value_heuristic
                 #F = value_heuristic
