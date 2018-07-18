@@ -1,14 +1,7 @@
-func movements() [][]int {
-// 	resp, _ := http.Get("http://localhost:8080/movimentos")
-// 	// Sinaliza que a última ação a ser feita no programa é o fechamento da resposta
-// 	defer resp.Body.Close()
+if line == len(board)-1 {
+	// 	position := []int{column - 1, line - 1}
+	// 	l = append(l, position)
 
-// 	// Por fim escreve o conteúdo do feed de rss
-// 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-// 	jsonstring = string(bodyBytes)
-
-// 	dec := json.NewDecoder(strings.NewReader(jsonstring))
-// 	dec.Decode(&listoflists)
-
-// 	return listoflists
-// }
+	// 	position := []int{column - 1, line}
+	// 	l = append(l, position)
+	// }

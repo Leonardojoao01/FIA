@@ -263,7 +263,7 @@ class boku(object):
                     #father.set_leaf(leaf)
                     list_leaf.append(leaf)
                     #=========================================================
-                    self.is_final_state(aux_board)
+                    # self.is_final_state(aux_board)
                     #=========================================================
                 y += 1
             y = 0
