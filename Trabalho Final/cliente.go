@@ -129,7 +129,7 @@ func get_movements() [][]int {
 func heuristic(board [][]int, position []int) int {
 	// var counter int{0}
 	counter := 0
-	l := nei(board, position)
+	l := vizinhos(board, position)
 	fmt.Println(position, l)
 
 	for _, index := range l {
@@ -148,6 +148,71 @@ func heuristic(board [][]int, position []int) int {
 		//}
 	}
 	return counter
+}
+
+func vizinhos(board [][]int, pos []int) [][]int {
+	column := pos[0]
+	line := pos[1]
+
+	var position []int
+	var l [][]int
+
+	if line < len(board[column])-1 { // DOWN
+		position = []int{column, line + 1}
+		l = append(l, position)
+	}
+
+	if column <= len(board)-1 && column != 0 { // DIAGONAL L/D
+		// fmt.Println("L/D")
+		if line != len(board[column])-1 && column < 6 {
+			position = []int{column - 1, line}
+			l = append(l, position)
+		} else if column >= 6 {
+			position = []int{column - 1, line + 1}
+			l = append(l, position)
+		}
+	}
+
+	if column <= len(board)-1 && column != 0 { // DIAGONAL L/U
+		// fmt.Println("L/U")
+		if column < 6 && line != 0 {
+			position = []int{column - 1, line - 1}
+			l = append(l, position)
+		} else if column >= 6 {
+			position = []int{column - 1, line}
+			l = append(l, position)
+		}
+	}
+
+	if line != 0 {
+		position = []int{column, line - 1} // UP
+		l = append(l, position)
+	}
+
+	if column < len(board)-1 { // DIAGONAL R/U
+		// fmt.Println("DIAGONAL D/U")
+		if column < 5 {
+			position = []int{column + 1, line}
+			l = append(l, position)
+		} else if column >= 5 && line != 0 {
+			position = []int{column + 1, line - 1}
+			l = append(l, position)
+		}
+	}
+
+	if column < len(board)-1 { // DIAGONAL R/D
+		// fmt.Println("DIAGONAL R/D")
+		if column < 5 {
+			position = []int{column + 1, line + 1}
+			l = append(l, position)
+		} else if column >= 5 && line != len(board[column+1]) {
+			position = []int{column + 1, line}
+			l = append(l, position)
+		}
+	}
+
+	return l
+
 }
 
 func nei(board [][]int, pos []int) [][]int {
