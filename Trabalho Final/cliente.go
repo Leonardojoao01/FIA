@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"sort"
 	"time"
 
 	// "encoding/json"
@@ -16,10 +17,22 @@ import (
 	// "strings"
 )
 
+var jogador int = 1
+var adversario int = 2
+
+// jogador := 2
+
 type Node struct {
-	movement []int
-	board    [][]int
+	movement  []int
+	board     [][]int
+	heuristic int
 }
+
+type ByHeuristic []Node
+
+func (a ByHeuristic) Len() int           { return len(a) }
+func (a ByHeuristic) Less(i, j int) bool { return a[i].heuristic > a[j].heuristic }
+func (a ByHeuristic) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 func (n Node) set_data(data []int, board [][]int) {
 	n.movement = data
@@ -36,6 +49,14 @@ func (n Node) set_board(data [][]int) {
 
 func (n Node) get_board() [][]int {
 	return n.board
+}
+
+func (n Node) set_heuristic(value_heuristic int) {
+	n.heuristic = value_heuristic
+}
+
+func (n Node) get_heuristic() int {
+	return n.heuristic
 }
 
 func get_player() int {
@@ -67,6 +88,28 @@ func get_board() [][]int {
 	// Por fim escreve o conteúdo do feed de rss
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	jsonstring = string(bodyBytes)
+
+	dec := json.NewDecoder(strings.NewReader(jsonstring))
+	dec.Decode(&listoflists)
+
+	return listoflists
+}
+
+func send_movement(movement []int) []int {
+
+	var jsonstring string
+	var listoflists []int
+
+	resp, _ := http.Get("http://localhost:8080/move?player=" + strconv.Itoa(jogador) + "&coluna=" + strconv.Itoa(movement[0]) + "&linha=" + strconv.Itoa(movement[1]))
+
+	// Sinaliza que a última ação a ser feita no programa é o fechamento da resposta
+	defer resp.Body.Close()
+
+	// Por fim escreve o conteúdo do feed de rss
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	jsonstring = string(bodyBytes)
+
+	// fmt.Println(jsonstring)
 
 	dec := json.NewDecoder(strings.NewReader(jsonstring))
 	dec.Decode(&listoflists)
@@ -130,18 +173,18 @@ func heuristic(board [][]int, position []int) int {
 	// var counter int{0}
 	counter := 0
 	l := vizinhos(board, position)
-	fmt.Println(position, l)
+	// fmt.Println(position, l)
 
 	for _, index := range l {
-		fmt.Println(index)
+		// fmt.Println(index)
 		//for index := 0; index < len(l); index++ {
 		if board[index[0]][index[1]] == 0 {
 			counter = counter + 10
 		}
-		if board[index[0]][index[1]] == 1 { // VERIFICAR o 1
+		if board[index[0]][index[1]] == jogador { // VERIFICAR o 1
 			counter = counter + 20
 		}
-		if board[index[0]][index[1]] == 2 {
+		if board[index[0]][index[1]] == adversario { // Jogador adversário
 			counter = counter - 10
 		}
 
@@ -210,279 +253,16 @@ func vizinhos(board [][]int, pos []int) [][]int {
 			l = append(l, position)
 		}
 	}
-
-	return l
-
-}
-
-func nei(board [][]int, pos []int) [][]int {
-	column := pos[0]
-	line := pos[1]
-
-	var position []int
-	var l [][]int
-
-	if line == 0 && column > 0 && column < len(board)-1 {
-		if column < 5 {
-			position = []int{column + 1, line + 1}
-			l = append(l, position)
-			position = []int{column + 1, line}
-			l = append(l, position)
-
-			position = []int{column, line + 1}
-			l = append(l, position)
-
-			position = []int{column - 1, line}
-			l = append(l, position)
-
-		} else if column > 5 {
-			position = []int{column - 1, line + 1}
-			l = append(l, position)
-			position = []int{column - 1, line}
-			l = append(l, position)
-
-			position = []int{column, line + 1}
-			l = append(l, position)
-
-			position = []int{column + 1, line}
-			l = append(l, position)
-
-		} else {
-			position = []int{column - 1, line}
-			l = append(l, position)
-			position = []int{column, line + 1}
-			l = append(l, position)
-			position = []int{column + 1, line}
-			l = append(l, position)
-		}
-	} else if column == 0 {
-		position = []int{column + 1, line}
-		l = append(l, position)
-
-		position = []int{column + 1, line + 1}
-		l = append(l, position)
-
-		if line < len(board[column])-1 && line > 0 {
-			position = []int{column, line + 1}
-			l = append(l, position)
-
-			position = []int{column, line - 1}
-			l = append(l, position)
-
-		} else if line < len(board[column])-1 {
-			position = []int{column, line + 1}
-			l = append(l, position)
-		} else if line > 0 {
-			position = []int{column, line - 1}
-			l = append(l, position)
-		}
-
-	} else if column == len(board)-1 {
-		position = []int{column - 1, line + 1}
-		l = append(l, position)
-
-		position = []int{column - 1, line}
-		l = append(l, position)
-
-		if line < len(board[column])-1 && line > 0 {
-			position = []int{column, line + 1}
-			l = append(l, position)
-
-			position = []int{column, line - 1}
-			l = append(l, position)
-		} else if line < len(board[column])-1 {
-			position = []int{column, line + 1}
-			l = append(l, position)
-		} else if line > 0 {
-			position = []int{column, line - 1}
-			l = append(l, position)
-		}
-
-	} else if line == len(board[column])-1 && column > 0 && column < len(board)-1 {
-
-		if column < 5 {
-			position = []int{column + 1, line + 1}
-			l = append(l, position)
-			position = []int{column, line - 1}
-			l = append(l, position)
-
-			position = []int{column + 1, line}
-			l = append(l, position)
-
-			// position = []int{column - 1, line - 1}
-			// l = append(l, position)
-
-			position = []int{column - 1, line - 1}
-			l = append(l, position)
-		} else if column > 5 {
-			position = []int{column - 1, line + 1}
-			l = append(l, position)
-			position = []int{column, line - 1}
-			l = append(l, position)
-
-			position = []int{column + 1, line - 1}
-			l = append(l, position)
-
-			// position = []int{column - 1, line - 1}
-			// l = append(l, position)
-
-			position = []int{column - 1, line}
-			l = append(l, position)
-		} else {
-			position = []int{column - 1, line - 1}
-			l = append(l, position)
-			position = []int{column, line - 1}
-			l = append(l, position)
-			position = []int{column + 1, line - 1}
-			l = append(l, position)
-		}
-	} else {
-		if column < 5 {
-			position = []int{column, line - 1}
-			l = append(l, position)
-
-			position = []int{column, line + 1}
-			l = append(l, position)
-
-			position = []int{column + 1, line + 1}
-			l = append(l, position)
-
-			position = []int{column - 1, line - 1}
-			l = append(l, position)
-
-			position = []int{column + 1, line}
-			l = append(l, position)
-
-			position = []int{column - 1, line}
-			l = append(l, position)
-
-		} else if column == 5 {
-			position = []int{column, line - 1}
-			l = append(l, position)
-
-			position = []int{column, line + 1}
-			l = append(l, position)
-
-			position = []int{column + 1, line - 1}
-			l = append(l, position)
-
-			position = []int{column - 1, line - 1}
-			l = append(l, position)
-
-			position = []int{column + 1, line}
-			l = append(l, position)
-
-			position = []int{column - 1, line}
-			l = append(l, position)
-		} else {
-			position = []int{column, line - 1}
-			l = append(l, position)
-
-			position = []int{column, line + 1}
-			l = append(l, position)
-
-			position = []int{column + 1, line - 1}
-			l = append(l, position)
-
-			position = []int{column - 1, line + 1}
-			l = append(l, position)
-
-			position = []int{column + 1, line}
-			l = append(l, position)
-
-			position = []int{column - 1, line}
-			l = append(l, position)
-		}
-	}
 	return l
 }
 
-func neighbors(board [][]int, position_t []int) [][]int {
-	column := position_t[0]
-	line := position_t[1]
-	var l [][]int
+// func sorting_plays(plays [][]int) [][]int {
 
-	if line > 1 {
-		position := []int{column, line - 1}
-		l = append(l, position) // up
-	}
+// }
 
-	if (column < 6 || line > 1) && (column < len(board)) {
-		fmt.Println("LEN:", len(board))
-		if column >= 6 {
-			position := []int{column + 1, line - 1}
-			l = append(l, position) // upper right
-			fmt.Println("A1:   ", position, column)
-		} else {
-			position := []int{column + 1, line}
-			l = append(l, position) // upper right
-			fmt.Println("A2:   ", position)
-		}
-	}
-
-	if (column > 6 || line > 1) && (column > 1) {
-		//fmt.Println("U")
-		if column > 6 {
-			position := []int{column - 1, line}
-			l = append(l, position) // upper left
-			fmt.Println("U1:   ", position)
-		} else {
-
-			position := []int{column - 1, line - 1}
-			l = append(l, position) // upper left
-			fmt.Println("U2:   ", position)
-		}
-	}
-
-	if column > 0 {
-
-		if line < len(board[column-1]) {
-			position := []int{column, line + 1}
-			l = append(l, position) // down
-			fmt.Println("1 IF: ", position)
-		}
-		//fmt.Println("jiuajhsdk")
-		if (column < 6 && line < len(board[column])-1) && column < len(board) {
-			// fmt.Println("2 IF")
-			// fmt.Println("LEN: ", len(board[column])-1)
-			// fmt.Println("LINE: ", line)
-			if column < 6 {
-
-				position := []int{column + 1, line - 1}
-				//fmt.Println("Posição+++++")
-				l = append(l, position) // down right
-				fmt.Println("21 IF:", position)
-
-				// } else if column > 6 {
-				// fmt.Println("Posição")
-			} else {
-				position := []int{column + 1, line}
-				l = append(l, position) // down
-				fmt.Println("22 IF:", position)
-			}
-		}
-
-		if (column > 6 || line < len(board[column])) && column > 1 {
-			// fmt.Println("3 IF")
-			if column > 6 {
-
-				position := []int{column - 1, line + 1}
-				l = append(l, position) // down left
-				fmt.Println("31 IF:", position)
-			} else {
-				// fmt.Println("32 IF")
-				position := []int{column - 1, line}
-				l = append(l, position) // down left
-				fmt.Println("32 IF:", position)
-			}
-		}
-	}
-
-	return l
-}
-
-func leaf_generating_matrix(board [][]int, level int) []Node {
+func leaf_generating_matrix(board [][]int, level int, position_father []int) []Node {
 	// var x, y, counter, x_size_table, y_size_table //int
+	// var position []int
 	x_size_table, y_size_table := 0, 0
 
 	list_leaf := []Node{}
@@ -495,20 +275,39 @@ func leaf_generating_matrix(board [][]int, level int) []Node {
 		for y := 0; y < y_size_table; y++ {
 			if board[x][y] == 0 {
 				aux_board = copy_board(board)
+				actual_position := []int{x, y}
 
 				if level%2 == 0 {
-					aux_board[x][y] = 1
+					aux_board[x][y] = jogador
 				} else {
-					aux_board[x][y] = 2
+					aux_board[x][y] = adversario
 				}
-				position := []int{x, y}
-				// leaf.set_data(position, aux_board)
-				leaf := Node{position, aux_board}
 
+				// if position_father[0] != -1 {
+				// 	position = position_father
+				// 	// fmt.Println("Position: ", position)
+				// 	// fmt.Println("++++++++++++")
+				// } else {
+				// 	position = actual_position
+				// 	// fmt.Println("Position: ", position)
+				// }
+
+				// fmt.Println(position)
+				// position := []int{x, y}
+				// leaf.set_data(position, aux_board)
+
+				//============== HEURISTICA ============
+				value_heuristic := heuristic(aux_board, actual_position) // Valor da heuristica
+				// fmt.Println("Heuristic: ", value_heuristic)
+				//======================================
+				// position_father := Node.get_data()
+
+				leaf := Node{actual_position, aux_board, value_heuristic}
+				// leaf := Node{position, aux_board, value_heuristic}	// Esse aqio
 				list_leaf = append(list_leaf, leaf)
 				//======================================
-				value_heuristic := heuristic(aux_board, position)
-				fmt.Println(value_heuristic)
+				// fmt.Println(actual_position)
+				// fmt.Println(value_heuristic)
 
 				//is_final_state(aux_board)
 			}
@@ -523,40 +322,79 @@ func leafs_generating_matrix(father []Node, depth int) {
 	//var board [][]int
 	//level := 0
 
-	for level := 0; level < depth; level++ {
+	//========================================================================
+	board := father[0]
+	copy(father, father[1:])
+	father = father[:len(father)-1]
+
+	position := []int{-1, -1}
+	father = append(father, leaf_generating_matrix(board.get_board(), 0, position)...)
+	//========================================================================
+
+	for level := 1; level < depth; level++ {
 		size_list_father := len(father)
 
 		for x := 0; x < size_list_father; x++ {
+
 			board := father[0]
 			copy(father, father[1:])
 			father = father[:len(father)-1]
 
-			aux := leaf_generating_matrix(board.get_board(), level)
+			//aux := leaf_generating_matrix(board.get_board(), level)
 
-			father = append(father, aux...)
+			father = append(father, leaf_generating_matrix(board.get_board(), level, board.get_data())...)
+			// father = father[:len(father)-1]
 		}
 	}
-	//fmt.Println(father[0].get_board())
+	// fmt.Println(father[1].get_board())
+	// fmt.Println(father[79].get_data())
+	//========= Realizar Jogada ==========
+	sort.Sort(ByHeuristic(father))
+
+	// s := sort.IntsAreSorted(father)
+
+	// sort.SliceStable(father, func(i, j int) bool { return father[i].heuristic < father[j].heuristic })
+	// sort.Slice(father[:], func(i, j int) bool { return father[i].heuristic < father[j].heuristic })
+	//====================================
+	// fmt.Println(father[0].get_heuristic())
+	fmt.Println(father[0].get_data())
+	fmt.Println(father[0].get_heuristic())
+	// valid := true
+	// for {
+	aux := father[0].get_data()
+	aux[0] = aux[0] + 1
+	aux[1] = aux[1] + 1
+
+	send_movement(aux)
+
+	fmt.Println(father[0].get_data())
+	fmt.Println(father[0].get_heuristic())
+	// }
+	// send_movement(father[0].get_data())
+
 }
 
 func player() {
 	var board, movements [][]int
 
-	// movements()
-	movements = get_movements()
-	// fmt.Println(len(movements))
-	if len(movements) > 2 {
-		position := []int{0, 0}
+	for {
 
-		board = get_board()
-		father := Node{position, board}
+		if jogador == get_player() {
+			movements = get_movements()
+			if len(movements) > 2 {
+				position := []int{0, 0}
 
-		leafs_generating_matrix([]Node{father}, 2)
+				board = get_board()
+				father := Node{position, board, 0}
 
-	} else {
-		fmt.Println("...")
+				leafs_generating_matrix([]Node{father}, 2)
+
+			} else {
+				fmt.Println("...")
+			}
+			time.Sleep(2 * time.Second)
+		}
 	}
-
 }
 
 func main() {
