@@ -1,26 +1,20 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"sort"
-	"time"
-
-	// "encoding/json"
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
-	"strings"
-
-	// "encoding/binary"
+	"sort"
 	"strconv"
-	// "strings"
+	"strings"
+	"time"
 )
 
 var jogador int = 1
 var adversario int = 2
-
-// jogador := 2
 
 type Node struct {
 	movement  []int
@@ -120,11 +114,8 @@ func send_movement(movement []int) []int {
 func sub_board(listoflists [][]int) [][]int {
 
 	for x, list := range listoflists {
-		// fmt.Println(list)
 		for y, value := range list {
-			// fmt.Println(value)
 			if value == 0 {
-				// fmt.Println("ZERO")
 				listoflists[x][y] = 1
 			}
 		}
@@ -141,7 +132,6 @@ func copy_board(listoflists [][]int) [][]int {
 		board[x] = make([]int, len(list))
 		for y, value := range list {
 			board[x][y] = value
-			// fmt.Println(x, y, value)
 		}
 	}
 	return board
@@ -176,21 +166,162 @@ func heuristic(board [][]int, position []int) int {
 	// fmt.Println(position, l)
 
 	for _, index := range l {
-		// fmt.Println(index)
-		//for index := 0; index < len(l); index++ {
 		if board[index[0]][index[1]] == 0 {
-			counter = counter + 10
+			counter = counter + 20
 		}
 		if board[index[0]][index[1]] == jogador { // VERIFICAR o 1
-			counter = counter + 20
+			counter = counter + 10
 		}
 		if board[index[0]][index[1]] == adversario { // Jogador adversário
 			counter = counter - 10
 		}
-
-		//}
 	}
+
+	aux := true
+	var juca []int
+	var counter_aux int
+	counter_aux = 1
+	for aux {
+		juca = vizinho_down(board, position)
+		// fmt.Println(juca)
+
+		if len(juca) > 0 {
+			if board[juca[0]][juca[1]] == adversario {
+				// fmt.Println("Entrou")
+				counter_aux = counter_aux + 1
+				// fmt.Println("IF")
+			} else {
+				// fmt.Printfln("ELSE")
+				aux = false
+
+			}
+		} else {
+			// fmt.Printfln("ELSE")
+			aux = false
+		}
+		position = juca
+	}
+	if counter_aux > 2 {
+		fmt.Println("Entrou: ", juca[0], juca[1])
+		counter = counter_aux * 100
+		// fmt.Println("Entrou")
+	}
+
+	//=================================================
+	// valeu_final := is_final_state(board)
+
+	// valeu_final = valeu_final + counter
+	// fmt.Println(valeu_final)
+
 	return counter
+}
+
+func vizinho_down(board [][]int, pos []int) []int {
+	column := pos[0]
+	line := pos[1]
+
+	var position []int
+	// var l [][]int
+
+	if line < len(board[column])-1 { // DOWN
+		position = []int{column, line + 1}
+		// l = append(l, position)
+	}
+	return position
+}
+
+func vizinho_left_down(board [][]int, pos []int) [][]int {
+	column := pos[0]
+	line := pos[1]
+
+	var position []int
+	var l [][]int
+
+	if column <= len(board)-1 && column != 0 { // DIAGONAL L/D
+		// fmt.Println("L/D")
+		if line != len(board[column])-1 && column < 6 {
+			position = []int{column - 1, line}
+			l = append(l, position)
+		} else if column >= 6 {
+			position = []int{column - 1, line + 1}
+			l = append(l, position)
+		}
+	}
+	return l
+}
+
+func vizinho_left_up(board [][]int, pos []int) [][]int {
+	column := pos[0]
+	line := pos[1]
+
+	var position []int
+	var l [][]int
+
+	if column <= len(board)-1 && column != 0 { // DIAGONAL L/U
+		// fmt.Println("L/U")
+		if column < 6 && line != 0 {
+			position = []int{column - 1, line - 1}
+			l = append(l, position)
+		} else if column >= 6 {
+			position = []int{column - 1, line}
+			l = append(l, position)
+		}
+	}
+	return l
+}
+
+func vizinho_up(board [][]int, pos []int) [][]int {
+	column := pos[0]
+	line := pos[1]
+
+	var position []int
+	var l [][]int
+
+	if line != 0 {
+		position = []int{column, line - 1} // UP
+		l = append(l, position)
+	}
+	return l
+}
+
+func vizinho_right_up(board [][]int, pos []int) [][]int {
+	column := pos[0]
+	line := pos[1]
+
+	var position []int
+	var l [][]int
+
+	if column < len(board)-1 { // DIAGONAL R/U
+		// fmt.Println("DIAGONAL D/U")
+		if column < 5 {
+			position = []int{column + 1, line}
+			l = append(l, position)
+		} else if column >= 5 && line != 0 {
+			position = []int{column + 1, line - 1}
+			l = append(l, position)
+		}
+	}
+	return l
+}
+
+func vizinho_right_down(board [][]int, pos []int) [][]int {
+	column := pos[0]
+	line := pos[1]
+
+	var position []int
+	var l [][]int
+
+	if column < len(board)-1 { // DIAGONAL R/D
+		// fmt.Println("DIAGONAL R/D")
+		if column < 5 {
+			position = []int{column + 1, line + 1}
+			l = append(l, position)
+		} else if column >= 5 && line != len(board[column+1]) {
+			position = []int{column + 1, line}
+			l = append(l, position)
+		}
+	}
+	return l
 }
 
 func vizinhos(board [][]int, pos []int) [][]int {
@@ -256,9 +387,179 @@ func vizinhos(board [][]int, pos []int) [][]int {
 	return l
 }
 
-// func sorting_plays(plays [][]int) [][]int {
+//==============================================================================
 
-// }
+func neighbors(board [][]int, column int, line int) []int {
+	var l []int
+	// var position []int
+
+	if line > 1 {
+		// position = []int{column, line - 1}
+		l = append(l, (column))
+		l = append(l, (line - 1))
+	}
+
+	if (column < 6 || line > 1) && (column < len(board)) {
+		if column >= 6 {
+			// position = []int{column + 1, line - 1}
+			l = append(l, (column + 1))
+			l = append(l, (line - 1))
+
+		} else {
+			// position = []int{column + 1, line}
+			l = append(l, (column + 1))
+			l = append(l, (line))
+		}
+	}
+
+	if (column > 6 || line > 1) && (column > 1) {
+		if column > 6 {
+			// position = []int{column - 1, line}
+			l = append(l, (column - 1))
+			l = append(l, (line))
+		} else {
+			// position = []int{column - 1, line - 1}
+			l = append(l, (column - 1))
+			l = append(l, (line - 1))
+		}
+	}
+
+	if line < len(board[column-1]) {
+		// position = []int{column, line + 1}
+		l = append(l, (column))
+		l = append(l, (line + 1))
+	}
+	// l.append((column, line+1))  # down
+
+	if (column < 6 || line < len(board[column-1])) && column < len(board) {
+		if column < 6 {
+			// position = []int{column + 1, line + 1}
+			l = append(l, (column + 1))
+			l = append(l, (line + 1))
+			// l.append((column+1, line+1))  // down right
+		} else {
+			// position = []int{column + 1, line}
+			l = append(l, (column + 1))
+			l = append(l, (line))
+			// l.append((column+1, line))  // down right
+		}
+	}
+
+	if (column > 6 || line < len(board[column-1])) && column > 1 {
+		if column > 6 {
+			// position = []int{column - 1, line + 1}
+			l = append(l, (column - 1))
+			l = append(l, (line + 1))
+			// l.append((column-1, line+1))  // down left
+		} else {
+			// position = []int{column - 1, line}
+			l = append(l, (column - 1))
+			l = append(l, (line))
+			// l.append((column-1, line)) // down left
+		}
+	}
+
+	return l
+}
+
+func is_final_state(board [][]int) int {
+
+	player := 100
+	adversario := 200
+	var juca string
+
+	for _, list := range board {
+		// fmt.Println("JUCAAAAAA: ", list)
+		var s bytes.Buffer
+		for _, value := range list {
+			juca = strconv.Itoa(value)
+			// s = append(s, value)
+			s.WriteString(juca)
+			// fmt.Println("String: ", s)
+			if strings.HasSuffix(s.String(), "111") {
+				fmt.Println("ENTROU 111")
+				return player
+			}
+			if strings.HasSuffix(s.String(), "222") {
+				fmt.Println("ENTROU 222")
+				return adversario
+			}
+		}
+	}
+
+	// // aux := true
+	// var diags = [][]int{{1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}, {2, 6}, {3, 7}, {4, 8}, {5, 9}, {6, 10}}
+	// // var diags = [][]int{{1,10}
+	// for _, coords := range diags {
+	// 	//for column_0, line_0 in diags:
+	// 	var s string
+	// 	aux := true
+	// 	for aux {
+	// 		// =============================================
+	// 		column := coords[0]
+	// 		copy(coords, coords[1:])
+	// 		coords = coords[:len(coords)-1]
+	// 		// ==============================
+	// 		line := coords[0]
+	// 		copy(coords, coords[1:])
+	// 		coords = coords[:len(coords)-1]
+	// 		// ==============================================
+	// 		// column := coords[0]
+	// 		// line := coords[1]
+
+	// 		state := board[column-1][line-1]
+
+	// 		s += string(state)
+	// 		if strings.HasSuffix(s, "111") {
+	// 			return player
+	// 		}
+	// 		if strings.HasSuffix(s, "222") {
+	// 			return adversario
+	// 		}
+
+	// 		coords = neighbors(board, column, line)
+	// 		if len(coords) > 0 {
+	// 			aux = false
+	// 		}
+	// 	}
+	// }
+
+	// var diags2 = [][]int{{6, 1}, {5, 1}, {4, 1}, {3, 1}, {2, 1}, {1, 1}, {1, 2}, {1, 3}, {1, 4}, {1, 5}}
+
+	// for _, coords := range diags2 {
+	// 	// for column_0, line_0 in diags:
+	// 	aux := true
+	// 	var s string
+	// 	for aux {
+	// 		// ==============================================
+	// 		column := coords[0]
+	// 		copy(coords, coords[1:])
+	// 		coords = coords[:len(coords)-1]
+	// 		// ==============================
+	// 		line := coords[0]
+	// 		copy(coords, coords[1:])
+	// 		coords = coords[:len(coords)-1]
+	// 		// ==============================================
+	// 		state := board[column-1][line-1]
+	// 		s += string(state)
+	// 		if strings.HasSuffix(s, "111") {
+	// 			return player
+	// 		}
+	// 		if strings.HasSuffix(s, "222") {
+	// 			return adversario
+	// 		}
+	// 		coords = neighbors(board, column, line)
+	// 		if len(coords) > 0 {
+	// 			aux = false
+	// 		}
+	// 	}
+	// }
+
+	return 0
+
+}
+
+//=========================================================================================
 
 func leaf_generating_matrix(board [][]int, level int, position_father []int) []Node {
 	// var x, y, counter, x_size_table, y_size_table //int
@@ -318,9 +619,6 @@ func leaf_generating_matrix(board [][]int, level int, position_father []int) []N
 }
 
 func leafs_generating_matrix(father []Node, depth int) {
-	//var size_list_father, level int
-	//var board [][]int
-	//level := 0
 
 	//========================================================================
 	board := father[0]
@@ -340,37 +638,25 @@ func leafs_generating_matrix(father []Node, depth int) {
 			copy(father, father[1:])
 			father = father[:len(father)-1]
 
-			//aux := leaf_generating_matrix(board.get_board(), level)
-
 			father = append(father, leaf_generating_matrix(board.get_board(), level, board.get_data())...)
-			// father = father[:len(father)-1]
 		}
 	}
 	// fmt.Println(father[1].get_board())
 	// fmt.Println(father[79].get_data())
 	//========= Realizar Jogada ==========
 	sort.Sort(ByHeuristic(father))
-
-	// s := sort.IntsAreSorted(father)
-
-	// sort.SliceStable(father, func(i, j int) bool { return father[i].heuristic < father[j].heuristic })
-	// sort.Slice(father[:], func(i, j int) bool { return father[i].heuristic < father[j].heuristic })
 	//====================================
+	// fmt.Println(father[0].get_data())
 	// fmt.Println(father[0].get_heuristic())
-	fmt.Println(father[0].get_data())
-	fmt.Println(father[0].get_heuristic())
-	// valid := true
-	// for {
 	aux := father[0].get_data()
 	aux[0] = aux[0] + 1
 	aux[1] = aux[1] + 1
-
+	fmt.Println("Heuristic: ", father[0].get_heuristic())
+	fmt.Println("Heuristic: ", father[0].get_data())
 	send_movement(aux)
 
-	fmt.Println(father[0].get_data())
-	fmt.Println(father[0].get_heuristic())
-	// }
-	// send_movement(father[0].get_data())
+	// fmt.Println(father[0].get_data())
+	// fmt.Println(father[0].get_heuristic())
 
 }
 
@@ -392,25 +678,16 @@ func player() {
 			} else {
 				fmt.Println("...")
 			}
-			time.Sleep(2 * time.Second)
+			time.Sleep(time.Second * 1)
 		}
 	}
 }
 
 func main() {
 
-	// var aux_board [][]int
-
-	// board := board()
-	// fmt.Println("Tabela Original:\n ", board)
-
-	// aux_board := copy_board(board)
-	// sub_board := sub_board(board)
-
-	// fmt.Println("Tabela Copiada:\n ", aux_board)
-	// fmt.Println("Tabela Modificada:\n ", sub_board)
 	start := time.Now()
 	player()
 	elapsed := time.Since(start)
 	log.Printf("Time %s", elapsed)
+
 }
