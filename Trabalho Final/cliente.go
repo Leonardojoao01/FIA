@@ -167,53 +167,73 @@ func heuristic(board [][]int, position []int) int {
 
 	for _, index := range l {
 		if board[index[0]][index[1]] == 0 {
-			counter = counter + 20
+			counter = counter + 10
 		}
 		if board[index[0]][index[1]] == jogador { // VERIFICAR o 1
-			counter = counter + 10
+			counter = counter + 20
 		}
 		if board[index[0]][index[1]] == adversario { // Jogador adversário
 			counter = counter - 10
 		}
 	}
+	her := 0.1
 
-	aux := true
-	var juca []int
-	var counter_aux int
-	counter_aux = 1
-	for aux {
-		juca = vizinho_down(board, position)
-		// fmt.Println(juca)
+	//==================JOGADOR =====================
+	value_neighbor_down, count_d := find_neighbor_down(board, position, jogador)
+	value_neighbor_left_down, count_ld := find_neighbor_left_down(board, position, jogador)
+	value_neighbor_left_up, count_lu := find_neighbor_left_up(board, position, jogador)
+	value_neighbor_up, count_u := find_neighbor_up(board, position, jogador)
+	value_neighbor_right_up, count_ru := find_neighbor_right_up(board, position, jogador)
+	value_neighbor_right_down, count_rd := find_neighbor_right_down(board, position, jogador)
 
-		if len(juca) > 0 {
-			if board[juca[0]][juca[1]] == adversario {
-				// fmt.Println("Entrou")
-				counter_aux = counter_aux + 1
-				// fmt.Println("IF")
-			} else {
-				// fmt.Printfln("ELSE")
-				aux = false
+	// counter = counter + value_neighbor_down*count_d*her + value_neighbor_left_down*count_ld*her + value_neighbor_left_up*count_lu*her + value_neighbor_up*count_u*her + value_neighbor_right_up*count_ru*her + value_neighbor_right_down*count_rd*her
+	counter = counter + int(float64(value_neighbor_down*count_d)*her) + int(float64(value_neighbor_left_down*count_ld)*her) + int(float64(value_neighbor_left_up*count_lu)*her) + int(float64(value_neighbor_up*count_u)*her) + int(float64(value_neighbor_right_up*count_ru)*her) + int(float64(value_neighbor_right_down*count_rd)*her)
 
-			}
-		} else {
-			// fmt.Printfln("ELSE")
-			aux = false
-		}
-		position = juca
-	}
-	if counter_aux > 2 {
-		fmt.Println("Entrou: ", juca[0], juca[1])
-		counter = counter_aux * 100
-		// fmt.Println("Entrou")
-	}
-
+	//==================ADVERSARIO =====================
+	value_neighbor_down, _ = find_neighbor_down(board, position, adversario)
+	value_neighbor_left_down, _ = find_neighbor_left_down(board, position, adversario)
+	value_neighbor_left_up, _ = find_neighbor_left_up(board, position, adversario)
+	value_neighbor_up, _ = find_neighbor_up(board, position, adversario)
+	value_neighbor_right_up, _ = find_neighbor_right_up(board, position, adversario)
+	value_neighbor_right_down, _ = find_neighbor_right_down(board, position, adversario)
 	//=================================================
 	// valeu_final := is_final_state(board)
 
 	// valeu_final = valeu_final + counter
 	// fmt.Println(valeu_final)
+	counter = counter + value_neighbor_down + value_neighbor_left_down + value_neighbor_left_up + value_neighbor_up + value_neighbor_right_up + value_neighbor_right_down
 
 	return counter
+}
+
+// =====================================================================================
+
+func find_neighbor_down(board [][]int, position []int, current_player int) (int, int) {
+	var counter int = 0
+	var number_neighbor []int
+
+	aux := true
+	current_position := position
+
+	for aux {
+		number_neighbor = vizinho_down(board, current_position)
+		if len(number_neighbor) > 0 {
+			if board[number_neighbor[0]][number_neighbor[1]] == current_player {
+				counter = counter + 1
+			} else {
+				aux = false
+			}
+		} else {
+			aux = false
+		}
+		current_position = number_neighbor
+	}
+	aux_counter := counter
+
+	if counter > 2 {
+		counter = counter * 100
+	}
+	return counter, aux_counter
 }
 
 func vizinho_down(board [][]int, pos []int) []int {
@@ -230,99 +250,251 @@ func vizinho_down(board [][]int, pos []int) []int {
 	return position
 }
 
-func vizinho_left_down(board [][]int, pos []int) [][]int {
+// =======================================================================================
+
+func find_neighbor_left_down(board [][]int, position []int, current_player int) (int, int) {
+	var counter int = 0
+	var number_neighbor []int
+
+	aux := true
+	current_position := position
+
+	for aux {
+		number_neighbor = vizinho_left_down(board, current_position)
+		if len(number_neighbor) > 0 {
+			if board[number_neighbor[0]][number_neighbor[1]] == current_player {
+				counter = counter + 1
+			} else {
+				aux = false
+			}
+		} else {
+			aux = false
+		}
+		current_position = number_neighbor
+	}
+
+	aux_counter := counter
+
+	if counter > 2 {
+		counter = counter * 100
+	}
+	return counter, aux_counter
+}
+
+func vizinho_left_down(board [][]int, pos []int) []int {
 	column := pos[0]
 	line := pos[1]
 
 	var position []int
-	var l [][]int
+	// var l [][]int
 
 	if column <= len(board)-1 && column != 0 { // DIAGONAL L/D
 		// fmt.Println("L/D")
 		if line != len(board[column])-1 && column < 6 {
 			position = []int{column - 1, line}
-			l = append(l, position)
+			// l = append(l, position)
 		} else if column >= 6 {
 			position = []int{column - 1, line + 1}
-			l = append(l, position)
+			// l = append(l, position)
 		}
 	}
-	return l
+	return position
 }
 
-func vizinho_left_up(board [][]int, pos []int) [][]int {
+//========================================================================================
+
+func find_neighbor_left_up(board [][]int, position []int, current_player int) (int, int) {
+	var counter int = 0
+	var number_neighbor []int
+
+	aux := true
+	current_position := position
+
+	for aux {
+		number_neighbor = vizinho_left_up(board, current_position)
+		if len(number_neighbor) > 0 {
+			if board[number_neighbor[0]][number_neighbor[1]] == current_player {
+				counter = counter + 1
+			} else {
+				aux = false
+			}
+		} else {
+			aux = false
+		}
+		current_position = number_neighbor
+	}
+	aux_counter := counter
+
+	if counter > 2 {
+		counter = counter * 100
+	}
+	return counter, aux_counter
+}
+
+func vizinho_left_up(board [][]int, pos []int) []int {
 	column := pos[0]
 	line := pos[1]
 
 	var position []int
-	var l [][]int
+	// var l [][]int
 
 	if column <= len(board)-1 && column != 0 { // DIAGONAL L/U
 		// fmt.Println("L/U")
 		if column < 6 && line != 0 {
 			position = []int{column - 1, line - 1}
-			l = append(l, position)
+			// l = append(l, position)
 		} else if column >= 6 {
 			position = []int{column - 1, line}
-			l = append(l, position)
+			// l = append(l, position)
 		}
 	}
-	return l
+	return position
 }
 
-func vizinho_up(board [][]int, pos []int) [][]int {
+//========================================================================================
+func find_neighbor_up(board [][]int, position []int, current_player int) (int, int) {
+	var counter int = 0
+	var number_neighbor []int
+
+	aux := true
+	current_position := position
+
+	for aux {
+		number_neighbor = vizinho_up(board, current_position)
+		if len(number_neighbor) > 0 {
+			if board[number_neighbor[0]][number_neighbor[1]] == current_player {
+				counter = counter + 1
+			} else {
+				aux = false
+			}
+		} else {
+			aux = false
+		}
+		current_position = number_neighbor
+	}
+	aux_counter := counter
+
+	if counter > 2 {
+		counter = counter * 100
+	}
+	return counter, aux_counter
+}
+
+func vizinho_up(board [][]int, pos []int) []int {
 	column := pos[0]
 	line := pos[1]
 
 	var position []int
-	var l [][]int
+	// var l [][]int
 
 	if line != 0 {
 		position = []int{column, line - 1} // UP
-		l = append(l, position)
+		// l = append(l, position)
 	}
-	return l
+	return position
 }
 
-func vizinho_right_up(board [][]int, pos []int) [][]int {
+//  ======================================================================================
+
+func find_neighbor_right_up(board [][]int, position []int, current_player int) (int, int) {
+	var counter int = 0
+	var number_neighbor []int
+
+	aux := true
+	current_position := position
+
+	for aux {
+		number_neighbor = vizinho_right_up(board, current_position)
+		if len(number_neighbor) > 0 {
+			if board[number_neighbor[0]][number_neighbor[1]] == current_player {
+				counter = counter + 1
+			} else {
+				aux = false
+			}
+		} else {
+			aux = false
+		}
+		current_position = number_neighbor
+	}
+	aux_counter := counter
+
+	if counter > 2 {
+		counter = counter * 100
+	}
+	return counter, aux_counter
+}
+
+func vizinho_right_up(board [][]int, pos []int) []int {
 	column := pos[0]
 	line := pos[1]
 
 	var position []int
-	var l [][]int
+	// var l [][]int
 
 	if column < len(board)-1 { // DIAGONAL R/U
 		// fmt.Println("DIAGONAL D/U")
 		if column < 5 {
 			position = []int{column + 1, line}
-			l = append(l, position)
+			// l = append(l, position)
 		} else if column >= 5 && line != 0 {
 			position = []int{column + 1, line - 1}
-			l = append(l, position)
+			// l = append(l, position)
 		}
 	}
-	return l
+	return position
 }
 
-func vizinho_right_down(board [][]int, pos []int) [][]int {
+//  ======================================================================================
+
+func find_neighbor_right_down(board [][]int, position []int, current_player int) (int, int) {
+	var counter int = 0
+	var number_neighbor []int
+
+	aux := true
+	current_position := position
+
+	for aux {
+		number_neighbor = vizinho_right_down(board, current_position)
+		if len(number_neighbor) > 0 {
+			if board[number_neighbor[0]][number_neighbor[1]] == current_player {
+				counter = counter + 1
+			} else {
+				aux = false
+			}
+		} else {
+			aux = false
+		}
+		current_position = number_neighbor
+	}
+	aux_counter := counter
+
+	if counter > 2 {
+		counter = counter * 100
+	}
+	return counter, aux_counter
+}
+
+func vizinho_right_down(board [][]int, pos []int) []int {
 	column := pos[0]
 	line := pos[1]
 
 	var position []int
-	var l [][]int
+	// var l [][]int
 
 	if column < len(board)-1 { // DIAGONAL R/D
 		// fmt.Println("DIAGONAL R/D")
 		if column < 5 {
 			position = []int{column + 1, line + 1}
-			l = append(l, position)
+			// l = append(l, position)
 		} else if column >= 5 && line != len(board[column+1]) {
 			position = []int{column + 1, line}
-			l = append(l, position)
+			// l = append(l, position)
 		}
 	}
-	return l
+	return position
 }
+
+// =======================================================================================
 
 func vizinhos(board [][]int, pos []int) [][]int {
 	column := pos[0]
