@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"sort"
 	"strconv"
@@ -13,8 +12,8 @@ import (
 	"time"
 )
 
-var jogador int = 1
-var adversario int = 2
+var jogador int = 2
+var adversario int = 1
 
 type Node struct {
 	movement  []int
@@ -857,9 +856,13 @@ func player() {
 
 func main() {
 
-	start := time.Now()
-	player()
-	elapsed := time.Since(start)
-	log.Printf("Time %s", elapsed)
+	// start := time.Now()
+	// player()
+	// elapsed := time.Since(start)
+	// log.Printf("Time %s", elapsed)
+
+	// jaja := send_movement([]int{1, 3})
+	jaja := send_movement([]int{1, 3})
+	fmt.Println(jaja)
 
 }

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"sort"
 	"strconv"
@@ -12,8 +11,8 @@ import (
 	"time"
 )
 
-var jogador int = 1
-var adversario int = 2
+var jogador int = 2
+var adversario int = 1
 
 type Node struct {
 	movement  []int
@@ -102,10 +101,19 @@ func send_movement(movement []int) []int {
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
 	jsonstring = string(bodyBytes)
 
-	// fmt.Println(jsonstring)
+	jsonstring = strings.Replace(jsonstring, "(", "[", -1)
+	jsonstring = strings.Replace(jsonstring, ")", "]", -1)
 
+	// fmt.Println(jsonstring)
+	// fmt.Println(jsonstring[1])
 	dec := json.NewDecoder(strings.NewReader(jsonstring))
 	dec.Decode(&listoflists)
+
+	if jsonstring[1] == 50 {
+		movements := get_movements()
+		send_movement(movements[0])
+		// fmt.Println(movements[0])
+	}
 
 	return listoflists
 }
@@ -201,7 +209,7 @@ func heuristic(board [][]int, position []int, level int) int {
 
 	if level == 0 {
 		counter = counter + value_neighbor_down*her*5 + value_neighbor_left_down*her*5 + value_neighbor_left_up*her*5 + value_neighbor_up*her*5 + value_neighbor_right_up*her*5 + value_neighbor_right_down*her*5
-		fmt.Println("Entrou: ", counter)
+		// fmt.Println("Entrou: ", counter)
 	} else {
 
 		counter = counter + value_neighbor_down + value_neighbor_left_down + value_neighbor_left_up + value_neighbor_up + value_neighbor_right_up + value_neighbor_right_down
@@ -222,7 +230,7 @@ func heuristic(board [][]int, position []int, level int) int {
 	// // fmt.Println(valeu_final)
 	if level == 0 {
 		counter = counter + value_neighbor_down*her*5 + value_neighbor_left_down*her*5 + value_neighbor_left_up*her*5 + value_neighbor_up*her*5 + value_neighbor_right_up*her*5 + value_neighbor_right_down*her*5
-		fmt.Println("Entrou: ", counter)
+		// fmt.Println("Entrou: ", counter)
 	} else {
 
 		counter = counter + value_neighbor_down + value_neighbor_left_down + value_neighbor_left_up + value_neighbor_up + value_neighbor_right_up + value_neighbor_right_down
@@ -809,9 +817,10 @@ func leafs_generating_matrix(father []Node, depth int) {
 	aux := father[0].get_data()
 	aux[0] = aux[0] + 1
 	aux[1] = aux[1] + 1
-	fmt.Println("Heuristic: ", father[0].get_heuristic())
-	fmt.Println("Heuristic: ", father[0].get_data())
-	send_movement(aux)
+	// fmt.Println("Heuristic: ", father[0].get_heuristic())
+	// fmt.Println("Heuristic: ", father[0].get_data())
+	jaja := send_movement(aux)
+	fmt.Println(jaja)
 
 	// fmt.Println(father[0].get_data())
 	// fmt.Println(father[0].get_heuristic())
@@ -819,23 +828,24 @@ func leafs_generating_matrix(father []Node, depth int) {
 }
 
 func player() {
-	var board, movements [][]int
+	// var board, movements [][]int
+	var board [][]int
 
 	for {
 
 		if jogador == get_player() {
-			movements = get_movements()
-			if len(movements) > 2 {
-				position := []int{0, 0}
+			// movements = get_movements()
+			// if len(movements) > 2 {
+			position := []int{0, 0}
 
-				board = get_board()
-				father := Node{position, board, 0}
+			board = get_board()
+			father := Node{position, board, 0}
 
-				leafs_generating_matrix([]Node{father}, 2)
+			leafs_generating_matrix([]Node{father}, 2)
 
-			} else {
-				fmt.Println("...")
-			}
+			// } else {
+			// fmt.Println("...")
+			// }
 			time.Sleep(time.Second * 1)
 		}
 	}
@@ -843,9 +853,22 @@ func player() {
 
 func main() {
 
-	start := time.Now()
+	// start := time.Now()
 	player()
-	elapsed := time.Since(start)
-	log.Printf("Time %s", elapsed)
+	// elapsed := time.Since(start)
+	// log.Printf("Time %s", elapsed)
 
+	// aux[0] := 0 + 1
+	// aux[1] = 0 + 1
+	// fmt.Println("Heuristic: ", father[0].get_heuristic())
+	// fmt.Println("Heuristic: ", father[0].get_data())
+
+	// jaja := send_movement([]int{1, 4})
+	// jaja := send_movement([]int{2, 6})
+	// jaja := send_movement([]int{1, 4})
+
+	// fmt.Println(jaja)
+	//
+	// movements := get_movements()
+	// fmt.Println(movements[0])
 }
